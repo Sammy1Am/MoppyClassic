@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk;
 
 import gnu.io.SerialPort;
@@ -9,10 +5,17 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class MoppyPlayer implements Receiver {
 
+    /**
+     * The periods for each MIDI note in an array.  The floppy drives
+     * don't really do well outside of the defined range, so skip those notes.
+     * Periods are in microseconds because that's what the Arduino uses for its
+     * clock-cycles in the micro() function, and because milliseconds aren't
+     * precise enough for musical notes.
+     */
     public static int[] microPeriods = {
         0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,
@@ -36,15 +39,26 @@ public class MoppyPlayer implements Receiver {
         mb.close();
     }
 
+    //Is called by Java MIDI libraries for each MIDI message encountered.
     public void send(MidiMessage message, long timeStamp) {
         if (message.getStatus() > 127 && message.getStatus() < 144){ // Note OFF
+            //Convert the MIDI channel being used to the controller pin on the
+            //Arduino by multipying by 2.
             byte pin = (byte)(2*(message.getStatus() - 127));
+            
             //System.out.println("Got note OFF on pin: " + (channel & 0xFF));
             mb.sendEvent(pin, 0);
         }
         else if (message.getStatus() > 143 && message.getStatus() < 160){ // Note ON
+            //Convert the MIDI channel being used to the controller pin on the
+            //Arduino by multipying by 2.
             byte pin = (byte)(2*(message.getStatus() - 143));
+            
+            //Get note number from MIDI message, and look up the period.
+            //NOTE: Java bytes range from -128 to 127, but we need to make them
+            //0-255 to use for lookups.  & 0xFF does the trick.
             int period = microPeriods[(message.getMessage()[1] & 0xff)];
+            
             //System.out.println("Got note ON on pin: " + (pin & 0xFF) + " with period " + period);
             mb.sendEvent(pin, period);
         }

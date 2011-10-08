@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -34,19 +30,17 @@ public class Main {
         MoppyPlayer mp = null;
 
         try {
-            mb = new MoppyBridge("COM3");
+            mb = new MoppyBridge("COM6"); //Create MoppyBridge on the COM port with the Arduino
             mp = new MoppyPlayer(mb);
 
             mb.resetDrives();
 
-            
-
-
-
-            Sequence sequence = MidiSystem.getSequence(new File("songs/ImperialMarch.mid"));
+            //Load a MIDI file (TODO: Make this an argument, or a GUI window)
+            Sequence sequence = MidiSystem.getSequence(new File("samplesongs/KirbysTheme.mid"));
 
             final Sequencer sequencer = MidiSystem.getSequencer(false);
 
+            //Start a new thread to listen on the command-line to exit the program early
             new Thread(){
                 @Override
             public void run(){
@@ -54,6 +48,8 @@ public class Main {
                  while (true){
                         try {
                             if (br.readLine().equalsIgnoreCase("exit")) {
+                                sequencer.stop();
+                                sequencer.close();
                                 System.exit(0);
                             }
                         } catch (IOException ex) {
@@ -63,16 +59,22 @@ public class Main {
             }
             }.start();
 
+            
+            //Start the sequencer, and set the tempo (not being read from file!)
             sequencer.open();
             sequencer.setSequence(sequence);
-            sequencer.setTempoInBPM(110);
+            sequencer.setTempoInBPM(160);
             System.out.println(sequence.getTracks().length);
-            sequencer.getTransmitter().setReceiver(mp);
+            sequencer.getTransmitter().setReceiver(mp); // Set MoppyPlayer as a receiver.
 
-            sequencer.start();
+            sequencer.start(); //GO!
+            
+            //Wait til the sequence is done...
             while (sequencer.isRunning()){
                 Thread.sleep(3000);
             }
+            
+            //Close the sequencer
             sequencer.close();
 
         } catch (MidiUnavailableException ex) {
@@ -90,7 +92,7 @@ public class Main {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-
+            //Reset everything and close down cleanly (hopefully)
             if (mb != null){
                 mb.resetDrives();
                 mb.close();
