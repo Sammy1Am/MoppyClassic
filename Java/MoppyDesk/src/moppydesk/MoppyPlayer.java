@@ -27,6 +27,12 @@ public class MoppyPlayer implements Receiver {
         0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0
     };
+    
+    /**
+     * Resolution of the Arduino code in microSeconds.
+     */
+    public static int ARDUINO_RESOLUTION = 40;
+    
 
     MoppyBridge mb;
     SerialPort com;
@@ -46,7 +52,7 @@ public class MoppyPlayer implements Receiver {
             //Arduino by multipying by 2.
             byte pin = (byte)(2*(message.getStatus() - 127));
             
-            //System.out.println("Got note OFF on pin: " + (channel & 0xFF));
+            //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
             mb.sendEvent(pin, 0);
         }
         else if (message.getStatus() > 143 && message.getStatus() < 160){ // Note ON
@@ -57,10 +63,22 @@ public class MoppyPlayer implements Receiver {
             //Get note number from MIDI message, and look up the period.
             //NOTE: Java bytes range from -128 to 127, but we need to make them
             //0-255 to use for lookups.  & 0xFF does the trick.
-            int period = microPeriods[(message.getMessage()[1] & 0xff)];
+            
+            // After looking up the period, devide by (the Arduino resolution * 2).
+            // The Arduino's timer will only tick once per X microseconds based on the
+            // resolution.  And each tick will only turn the pin on or off.  So a full
+            // on-off cycle (one step on the floppy) is two periods.
+            int period = microPeriods[(message.getMessage()[1] & 0xff)]/(ARDUINO_RESOLUTION*2);
             
             //System.out.println("Got note ON on pin: " + (pin & 0xFF) + " with period " + period);
-            mb.sendEvent(pin, period);
+            //System.out.println(message.getLength() + " " + message.getMessage()[message.getLength()-1]);
+            
+            //Zero velocity events turn off the pin.
+            if (message.getMessage()[2] == 0){
+                mb.sendEvent(pin, 0);
+            } else {
+                mb.sendEvent(pin, period);
+            }
         }
     }
 }

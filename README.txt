@@ -9,9 +9,11 @@ by Sammy1Am
 Moppy is a M_usical Fl_oppy controller program built for the Ardiuno UNO.
 
 --INSTALLATION--
+The Arduino code requires the TimeOne library available here: http://www.arduino.cc/playground/Code/Timer1
+
+You will need to follow the directions in the appropriate Java/SerialDrivers folder for your system to install the serial drivers prior to running Moppy.
 
 Upload the included Arduino code to the Arduino of your choice, and open up the included Java code in your favorite IDE.  This code includes a NetBeans project for your convenience, so you should be able to open the project directly in NetBeans.
-
 
 --HARDWARE--
 

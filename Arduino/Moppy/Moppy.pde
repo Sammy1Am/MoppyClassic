@@ -1,8 +1,11 @@
+#include <TimerOne.h>
+
 boolean firstRun = true; // Used for one-run-only stuffs;
 
 //First pin being used for floppies, and the last pin.  Used for looping over all pins.
 const byte FIRST_PIN = 2;
 const byte PIN_MAX = 9;
+#define RESOLUTION 40 //Microsecond resolution for notes
 
 
 /*NOTE: Many of the arrays below contain unused indexes.  This is 
@@ -14,23 +17,35 @@ stored in index 4.*/
 
 /*An array of maximum track positions for each step-control pin.  Even pins
 are used for control, so only even numbers need a value here.  3.5" Floppies have
-80 tracks, 5.25" have 50 (use 79 and 49).
+80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
+half a position (use 158 and 98).
 */
 byte MAX_POSITION[] = {
-  0,0,79,0,79,0,79,0,79,0};
+  0,0,158,0,158,0,158,0,158,0};
   
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
 byte currentPosition[] = {
   0,0,0,0,0,0,0,0,0,0};
 
-//Array to keep track of the direction for each floppy head.  (Only even indexes are used)
-boolean stepDirection[] = {
-  false,false,false,false,false,false,false,false,false,false}; // false = forward, true=reverse (i.e. true=HIGH)
+/*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
+track direction-pins.  LOW = forward, HIGH=reverse
+*/
+int currentState[] = {
+  0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW 
+};
   
-//Current period assigned to each pin.  0 = off.
+//Current period assigned to each pin.  0 = off.  Each period is of the length specified by the RESOLUTION
+//variable above.  i.e. A period of 10 is (RESOLUTION x 10) microseconds long.
 unsigned int currentPeriod[] = {
   0,0,0,0,0,0,0,0,0,0 
 };
+
+//Current tick
+unsigned int currentTick[] = {
+  0,0,0,0,0,0,0,0,0,0 
+};
+
+
 
 //Setup pins (Even-odd pairs for step control and direction
 void setup(){
@@ -43,6 +58,9 @@ void setup(){
   pinMode(7, OUTPUT); // Direction 3
   pinMode(8, OUTPUT); // Step control 4
   pinMode(9, OUTPUT); // Direction 5
+
+  Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
+  Timer1.attachInterrupt(tick); // Attach the tick function
 
   Serial.begin(9600);
 }
@@ -69,60 +87,78 @@ void loop(){
       currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
     }
   }
-
-  voice();
 }
 
+
 /*
-The voice() method controls WHEN each pin will be stepped by mod'ing the Arduino system-clock
-against the currentPeriod for each pin.  A period of 0 will skip the pin (i.e. pin is off)
+Called by the timer inturrupt at the specified resolution.
 */
-void voice()
+void tick()
 {
-  if (currentPeriod[2] > 0 && micros()%currentPeriod[2] < 100){
-    stepPin(2,3,4); 
+  /* 
+  If there is a period set for control pin 2, count the number of
+  ticks that pass, and toggle the pin if the current period is reached.
+  */
+  if (currentPeriod[2]>0){
+    currentTick[2]++;
+    if (currentTick[2] >= currentPeriod[2]){
+      togglePin(2,3);
+      currentTick[2]=0;
+    }
   }
-  if (currentPeriod[4] > 0 && micros()%currentPeriod[4] < 100){
-    stepPin(4,5,4); 
+  if (currentPeriod[4]>0){
+    currentTick[4]++;
+    if (currentTick[4] >= currentPeriod[4]){
+      togglePin(4,5);
+      currentTick[4]=0;
+    }
   }
-  if (currentPeriod[6] > 0 && micros()%currentPeriod[6] < 100){
-    stepPin(6,7,4); 
+  if (currentPeriod[6]>0){
+    currentTick[6]++;
+    if (currentTick[6] >= currentPeriod[6]){
+      togglePin(6,7);
+      currentTick[6]=0;
+    }
   }
-  if (currentPeriod[8] > 0 && micros()%currentPeriod[8] < 100){
-    stepPin(8,9,4); 
+  if (currentPeriod[8]>0){
+    currentTick[8]++;
+    if (currentTick[8] >= currentPeriod[8]){
+      togglePin(8,9);
+      currentTick[8]=0;
+    }
   }
+  
 }
 
-/*
-The stepPin() method controls the actual stepping of each pin.  It uses the
-stepDireciton array to determine the state of the direction_pin, and will automatically
-reverse the direction when needed.
-*/
-void stepPin(byte pin, byte direction_pin, byte wait) {
+void togglePin(byte pin, byte direction_pin) {
   
   //Switch directions if end has been reached
   if (currentPosition[pin] >= MAX_POSITION[pin]) {
-    stepDirection[pin] = true;
+    currentState[direction_pin] = HIGH;
+    digitalWrite(direction_pin,HIGH);
   } 
   else if (currentPosition[pin] <= 0) {
-    stepDirection[pin] = false;
+    currentState[direction_pin] = LOW;
+    digitalWrite(direction_pin,LOW);
   }
   
-  //Set direction_pin state, and update currentPosition
-  if (stepDirection[pin]){
-    digitalWrite(direction_pin,HIGH);
+    //Update currentPosition
+  if (currentState[direction_pin] == HIGH){
     currentPosition[pin]--;
   } 
   else {
-    digitalWrite(direction_pin,LOW);
     currentPosition[pin]++;
   }
   
   //Pulse the control pin
-  digitalWrite(pin,HIGH);
-  delayMicroseconds(wait);
-  digitalWrite(pin,LOW);
+  digitalWrite(pin,currentState[pin]);
+  currentState[pin] = ~currentState[pin];
 }
+
+
+//
+//// UTILITY FUNCTIONS
+//
 
 //Not used now, but good for debugging...
 void blinkLED(){
@@ -135,13 +171,14 @@ void blinkLED(){
 void reset(byte pin)
 {
   digitalWrite(pin+1,HIGH); // Go in reverse
-  for (byte s=0;s<MAX_POSITION[pin];s++){
+  for (byte s=0;s<MAX_POSITION[pin];s+=2){ //Half max because we're stepping directly (no toggle)
     digitalWrite(pin,HIGH);
     digitalWrite(pin,LOW);
     delay(5);
   }
   currentPosition[pin] = 0; // We're reset.
-  stepDirection[pin] = false; // Ready to go forward.
+  digitalWrite(pin+1,LOW);
+  currentPosition[pin+1] = LOW; // Ready to go forward.
 }
 
 //Resets all the pins
