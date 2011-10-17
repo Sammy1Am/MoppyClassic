@@ -30,7 +30,7 @@ public class MoppySequencer implements MetaEventListener{
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
     public MoppySequencer(String comPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
-        mb = new MoppyBridge("COM6"); //Create MoppyBridge on the COM port with the Arduino
+        mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
         mp = new MoppyPlayer(mb);
 
         mb.resetDrives();
