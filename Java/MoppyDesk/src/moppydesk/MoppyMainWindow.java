@@ -11,6 +11,7 @@
 package moppydesk;
 
 import gnu.io.CommPortIdentifier;
+import java.awt.Component;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.logging.Level;
@@ -25,11 +26,10 @@ import javax.swing.JSlider;
  *
  * @author Sam
  */
-public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusConsumer{
+public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusConsumer {
 
     static String PREF_COM_PORT = "comPort";
     static String PREF_LOADED_SEQ = "loadedSequencePath";
-    
     MoppyUI app;
     Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
     final JFileChooser sequenceChooser = new JFileChooser();
@@ -42,12 +42,11 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
 
         updateComSelectionMenu();
 
-        initializeSequencer((String) comSelectionMenu.getSelectedItem());
-        
-        String previouslyLoadedFile = prefs.get(PREF_LOADED_SEQ, null);
-        if (previouslyLoadedFile != null){
-            loadSequenceFile(new File(previouslyLoadedFile));
-        }
+        statusLabel.setText("Ready");
+
+//        initializeSequencer((String) comSelectionMenu.getSelectedItem());
+//        
+//        
     }
 
     private void updateComSelectionMenu() {
@@ -75,6 +74,25 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
             JOptionPane.showMessageDialog(rootPane, ex);
         }
         statusLabel.setText("Sequencer connected to " + comPort);
+
+        String previouslyLoadedFile = prefs.get(PREF_LOADED_SEQ, null);
+        if (previouslyLoadedFile != null) {
+            loadSequenceFile(new File(previouslyLoadedFile));
+        }
+
+        setSequenceControlsEnabled(true);
+        connectSeqButton.setText("Disconnect");
+    }
+
+    private void shutdownSequencer() {
+        statusLabel.setText("Closing sequencer...");
+        if (app.ms != null) {
+            app.ms.closeSequencer();
+            app.ms = null;
+        }
+        setSequenceControlsEnabled(false);
+        connectSeqButton.setText("Connect");
+        statusLabel.setText("Sequencer closed");
     }
 
     /** This method is called from within the constructor to
@@ -86,38 +104,31 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        startButton = new javax.swing.JButton();
-        stopButton = new javax.swing.JButton();
         comSelectionMenu = new javax.swing.JComboBox();
         statusLabel = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        loadButton = new javax.swing.JButton();
-        sequenceNameLabel = new javax.swing.JLabel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        sequencerControlsPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        sequenceNameLabel = new javax.swing.JLabel();
+        startButton = new javax.swing.JButton();
+        stopButton = new javax.swing.JButton();
+        loadButton = new javax.swing.JButton();
         jSlider1 = new javax.swing.JSlider();
         bpmLabel = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
+        connectSeqButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("MoppyDesk");
+        setMinimumSize(new java.awt.Dimension(480, 410));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 MoppyMainWindow.this.windowClosing(evt);
-            }
-        });
-
-        startButton.setText("Start");
-        startButton.setEnabled(false);
-        startButton.setName("startButton"); // NOI18N
-        startButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startButtonClicked(evt);
-            }
-        });
-
-        stopButton.setText("Stop/Reset");
-        stopButton.setName("stopButton"); // NOI18N
-        stopButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stopResetClicked(evt);
             }
         });
 
@@ -133,7 +144,46 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
 
         jSeparator1.setName("jSeparator1"); // NOI18N
 
+        jTabbedPane1.setName("bridgePanel"); // NOI18N
+
+        jPanel1.setName("sequencerPanel"); // NOI18N
+        jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentHidden(java.awt.event.ComponentEvent evt) {
+                seqTabHidden(evt);
+            }
+        });
+
+        sequencerControlsPanel.setName("sequencerControlsPanel"); // NOI18N
+        sequencerControlsPanel.setPreferredSize(new java.awt.Dimension(200, 200));
+
+        jLabel1.setText("Current Sequence:");
+        jLabel1.setEnabled(false);
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        sequenceNameLabel.setText("<None loaded>");
+        sequenceNameLabel.setEnabled(false);
+        sequenceNameLabel.setName("sequenceNameLabel"); // NOI18N
+
+        startButton.setText("Start");
+        startButton.setEnabled(false);
+        startButton.setName("startButton"); // NOI18N
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonClicked(evt);
+            }
+        });
+
+        stopButton.setText("Stop/Reset");
+        stopButton.setEnabled(false);
+        stopButton.setName("stopButton"); // NOI18N
+        stopButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stopResetClicked(evt);
+            }
+        });
+
         loadButton.setText("Load Sequence");
+        loadButton.setEnabled(false);
         loadButton.setName("loadButton"); // NOI18N
         loadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -141,17 +191,12 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
             }
         });
 
-        sequenceNameLabel.setText("<None loaded>");
-        sequenceNameLabel.setName("sequenceNameLabel"); // NOI18N
-
-        jLabel1.setText("Current Sequence:");
-        jLabel1.setName("jLabel1"); // NOI18N
-
         jSlider1.setMajorTickSpacing(10);
         jSlider1.setMaximum(210);
         jSlider1.setMinimum(20);
         jSlider1.setPaintTicks(true);
         jSlider1.setValue(120);
+        jSlider1.setEnabled(false);
         jSlider1.setName("jSlider1"); // NOI18N
         jSlider1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
@@ -160,7 +205,126 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         });
 
         bpmLabel.setText(jSlider1.getValue() + " bpm");
+        bpmLabel.setEnabled(false);
         bpmLabel.setName("bpmLabel"); // NOI18N
+
+        javax.swing.GroupLayout sequencerControlsPanelLayout = new javax.swing.GroupLayout(sequencerControlsPanel);
+        sequencerControlsPanel.setLayout(sequencerControlsPanelLayout);
+        sequencerControlsPanelLayout.setHorizontalGroup(
+            sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                                .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sequenceNameLabel)
+                                    .addComponent(jLabel1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                                .addComponent(loadButton))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sequencerControlsPanelLayout.createSequentialGroup()
+                                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                                .addComponent(startButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(stopButton))))
+                    .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                        .addGap(136, 136, 136)
+                        .addComponent(bpmLabel)))
+                .addContainerGap())
+        );
+        sequencerControlsPanelLayout.setVerticalGroup(
+            sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                        .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sequencerControlsPanelLayout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(sequenceNameLabel))
+                            .addComponent(loadButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+                        .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(sequencerControlsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(stopButton)
+                                .addComponent(startButton))
+                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sequencerControlsPanelLayout.createSequentialGroup()
+                        .addComponent(bpmLabel)
+                        .addGap(54, 54, 54))))
+        );
+
+        bpmLabel.getAccessibleContext().setAccessibleName(jSlider1.getValue() + " bpm");
+
+        jSeparator2.setName("jSeparator2"); // NOI18N
+
+        connectSeqButton.setText("Connect");
+        connectSeqButton.setToolTipText("Attempts to open selected COM port.");
+        connectSeqButton.setName("connectSequencerButton"); // NOI18N
+        connectSeqButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                connectSequencerPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(sequencerControlsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
+                .addContainerGap())
+            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(connectSeqButton)
+                .addContainerGap(373, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(connectSeqButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sequencerControlsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Sequencer", jPanel1);
+
+        jPanel2.setName("jPanel2"); // NOI18N
+
+        jLabel2.setText("Coming soon... (sorry!)");
+        jLabel2.setName("jLabel2"); // NOI18N
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addContainerGap(333, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addContainerGap(229, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Bridge", jPanel2);
+
+        jLabel3.setText("Arduino Port:");
+        jLabel3.setName("jLabel3"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -169,49 +333,32 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTabbedPane1)
                     .addComponent(statusLabel)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sequenceNameLabel)
-                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bpmLabel, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(startButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(stopButton))
-                            .addComponent(loadButton)))
-                    .addComponent(jLabel1))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(sequenceNameLabel)
-                    .addComponent(loadButton))
+                    .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
                 .addGap(18, 18, 18)
-                .addComponent(bpmLabel)
+                .addComponent(jTabbedPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(startButton)
-                        .addComponent(stopButton))
-                    .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusLabel)
                 .addContainerGap())
         );
+
+        jTabbedPane1.getAccessibleContext().setAccessibleName("Bridge"); // NOI18N
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -230,8 +377,8 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
 
     private void loadSequence(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSequence
         String previouslyLoaded = prefs.get(PREF_LOADED_SEQ, null);
-        if (previouslyLoaded != null){
-        sequenceChooser.setCurrentDirectory(new File(previouslyLoaded));
+        if (previouslyLoaded != null) {
+            sequenceChooser.setCurrentDirectory(new File(previouslyLoaded));
         }
         int returnVal = sequenceChooser.showOpenDialog(this);
 
@@ -242,21 +389,21 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         }
     }//GEN-LAST:event_loadSequence
 
-    private void loadSequenceFile(File sequenceFile){
+    private void loadSequenceFile(File sequenceFile) {
         try {
-                statusLabel.setText("Loading file...");
-                app.ms.loadFile(sequenceFile.getPath());
-                sequenceNameLabel.setText(sequenceFile.getName());
-                prefs.put(PREF_LOADED_SEQ, sequenceFile.getPath());
-                statusLabel.setText("Loaded " + sequenceFile.getName());
-                startButton.setEnabled(true);
-            } catch (Exception ex) {
-                Logger.getLogger(MoppyMainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                statusLabel.setText("File loading error!");
-                JOptionPane.showMessageDialog(rootPane, ex);
-            }
+            statusLabel.setText("Loading file...");
+            app.ms.loadFile(sequenceFile.getPath());
+            sequenceNameLabel.setText(sequenceFile.getName());
+            prefs.put(PREF_LOADED_SEQ, sequenceFile.getPath());
+            statusLabel.setText("Loaded " + sequenceFile.getName());
+            startButton.setEnabled(true);
+        } catch (Exception ex) {
+            Logger.getLogger(MoppyMainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            statusLabel.setText("File loading error!");
+            JOptionPane.showMessageDialog(rootPane, ex);
+        }
     }
-    
+
     private void tempoSliderChanged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tempoSliderChanged
         JSlider s = (JSlider) evt.getSource();
         app.ms.setTempo(s.getValue());
@@ -267,14 +414,34 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         JComboBox cb = (JComboBox) evt.getSource();
         if (comboBoxReady) {
             String comPort = (String) cb.getSelectedItem();
-            initializeSequencer(comPort);
+            shutdownSequencer();
             prefs.put(PREF_COM_PORT, comPort);
         }
     }//GEN-LAST:event_comPortSelected
 
     private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
-        app.ms.closeSequencer();
+        if (app.ms != null){
+            app.ms.closeSequencer();
+        }
     }//GEN-LAST:event_windowClosing
+
+    private void connectSequencerPressed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectSequencerPressed
+        if (connectSeqButton.getText().equals("Connect")) {
+            initializeSequencer((String) comSelectionMenu.getSelectedItem());
+        } else {
+            shutdownSequencer();
+        }
+    }//GEN-LAST:event_connectSequencerPressed
+
+    private void seqTabHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_seqTabHidden
+        shutdownSequencer();
+    }//GEN-LAST:event_seqTabHidden
+
+    private void setSequenceControlsEnabled(boolean enabled) {
+        for (Component c : sequencerControlsPanel.getComponents()) {
+            c.setEnabled(enabled);
+        }
+    }
 
     public void tempoChanged(int newTempo) {
         jSlider1.setValue(newTempo);
@@ -283,14 +450,21 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bpmLabel;
     private javax.swing.JComboBox comSelectionMenu;
+    private javax.swing.JButton connectSeqButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton loadButton;
     private javax.swing.JLabel sequenceNameLabel;
+    private javax.swing.JPanel sequencerControlsPanel;
     private javax.swing.JButton startButton;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JButton stopButton;
     // End of variables declaration//GEN-END:variables
-
 }

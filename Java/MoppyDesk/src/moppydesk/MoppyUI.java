@@ -16,7 +16,8 @@ public class MoppyUI extends SingleFrameApplication{
     
     @Override
     protected void startup() {
-        show(new MoppyMainWindow(this));
+        MoppyMainWindow mainWindow = new MoppyMainWindow(this);
+        show(mainWindow);
     }
     
      /**

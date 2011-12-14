@@ -55,7 +55,9 @@ public class MoppySequencer implements MetaEventListener{
     }
     
     public void stopSequencer(){
-        sequencer.stop();
+        if (sequencer.isOpen()){
+                sequencer.stop();
+            }
         mb.resetDrives();
     }
     
