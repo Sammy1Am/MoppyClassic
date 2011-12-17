@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class MoppyBridge {
 
     static int FIRST_PIN = 2;
-    static int MAX_PIN = 9;
+    static int MAX_PIN = 17;
     
     int SERIAL_RATE = 9600;
     OutputStream os;
