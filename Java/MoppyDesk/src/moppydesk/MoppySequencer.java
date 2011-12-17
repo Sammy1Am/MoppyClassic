@@ -47,7 +47,7 @@ public class MoppySequencer implements MetaEventListener{
         Sequence sequence = MidiSystem.getSequence(new File(filePath));
         
         sequencer.setSequence(sequence);
-        System.out.println("Loaded sequence with "+sequence.getTracks().length+" tracks.");
+        System.out.println("Loaded sequence with "+(sequence.getTracks().length-1)+" MIDI channels.");
     }
     
     public void startSequencer(){
@@ -55,7 +55,9 @@ public class MoppySequencer implements MetaEventListener{
     }
     
     public void stopSequencer(){
-        sequencer.stop();
+        if (sequencer.isOpen()){
+                sequencer.stop();
+            }
         mb.resetDrives();
     }
     

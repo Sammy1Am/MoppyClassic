@@ -21,18 +21,30 @@ I built Moppy using an Arduino UNO, though it should work just fine on most Ardu
 
 Some pinout information can be found here: http://pinouts.ru/Storage/InternalDisk_pinout.shtml
 
-Make sure you short the correct drive-select pin, or the drive won't respond to any input.  Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the drives will not register the pulses correctly.
+Make sure you ground the correct drive-select pin, or the drive won't respond to any input.  You can tell when you have the right drive selected, because the light on the front of the drive will come on.  Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the drives will not register the pulses correctly.
 
 
 --CONFIGURAITON / USE--
 
-Right now, there is no configuration for MoppyDesk (the Moppy Desktop application for controlling) and any variables need to be changed in the code itself.  This will be improved in the future.
+- Open up the code in NetBeans (or your favorite IDE) and run it.  Alternatively, you can build the MoppyDesk.jar file and run that.
+- Select the COM port that the Arduino is hooked up to from the "Arduino Port" drop-down.  You will need to have this configured before you launch MoppyDesk.
+- Click the "Connect" button to create a new Sequencer connected to the specified COM port.
+- Click the "Load Sequence" button and select a suitable MIDI file (see below).
+- Click "Start" to start playback (if all goes well).  
+- The Stop/Reset button will stop playback and reset the drives.  Pressing "Start" again will resume from where the sequencer left off.  You will need to reload the MIDI to start from the beginning.
 
-Edit the code to select the appropriate COM port, and point to the correct MIDI file.  Don't forget to edit the tempo in the code as well.
 
-MIDI files should have one MIDI track for each controller pin on the Arduino.  Track 1 will be sent to pin2, track 2 to pin4, &c.
+--MIDI FILE INFORMATION / GUIDELINES--
 
-Run the java code, cross your fingers, and enjoy!
+- MIDI files should have one MIDI channel for each controller pin on the Arduino.  Channel 1 will be sent to pin2, channel 2 to pin4, &c.
+- Each drive can only play a single note at a time.
+- The software will only attempt to play notes between C1 and B4.  Floppy drives don't seem to respond well to notes outside of this range (especially higher).
+- Generally shorter notes tend to sound better, as longer notes are marred by the read-heads changing directions repeatedly.
+
+
+
+
+Cross your fingers, and enjoy!
 
 --HELP/CONTRIBUTIONS--
 

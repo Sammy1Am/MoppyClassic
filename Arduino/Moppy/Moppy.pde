@@ -4,7 +4,7 @@ boolean firstRun = true; // Used for one-run-only stuffs;
 
 //First pin being used for floppies, and the last pin.  Used for looping over all pins.
 const byte FIRST_PIN = 2;
-const byte PIN_MAX = 9;
+const byte PIN_MAX = 17;
 #define RESOLUTION 40 //Microsecond resolution for notes
 
 
@@ -21,28 +21,28 @@ are used for control, so only even numbers need a value here.  3.5" Floppies hav
 half a position (use 158 and 98).
 */
 byte MAX_POSITION[] = {
-  0,0,158,0,158,0,158,0,158,0};
+  0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
   
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
 byte currentPosition[] = {
-  0,0,0,0,0,0,0,0,0,0};
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 /*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
 track direction-pins.  LOW = forward, HIGH=reverse
 */
 int currentState[] = {
-  0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW 
+  0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW
 };
   
 //Current period assigned to each pin.  0 = off.  Each period is of the length specified by the RESOLUTION
 //variable above.  i.e. A period of 10 is (RESOLUTION x 10) microseconds long.
 unsigned int currentPeriod[] = {
-  0,0,0,0,0,0,0,0,0,0 
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
 //Current tick
 unsigned int currentTick[] = {
-  0,0,0,0,0,0,0,0,0,0 
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
 };
 
 
@@ -57,7 +57,15 @@ void setup(){
   pinMode(6, OUTPUT); // Step control 3
   pinMode(7, OUTPUT); // Direction 3
   pinMode(8, OUTPUT); // Step control 4
-  pinMode(9, OUTPUT); // Direction 5
+  pinMode(9, OUTPUT); // Direction 4
+  pinMode(10, OUTPUT); // Step control 5
+  pinMode(11, OUTPUT); // Direction 5
+  pinMode(12, OUTPUT); // Step control 6
+  pinMode(13, OUTPUT); // Direction 6
+  pinMode(14, OUTPUT); // Step control 7
+  pinMode(15, OUTPUT); // Direction 7
+  pinMode(16, OUTPUT); // Step control 8
+  pinMode(17, OUTPUT); // Direction 8
 
   Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
   Timer1.attachInterrupt(tick); // Attach the tick function
@@ -127,6 +135,34 @@ void tick()
       currentTick[8]=0;
     }
   }
+  if (currentPeriod[10]>0){
+    currentTick[10]++;
+    if (currentTick[10] >= currentPeriod[10]){
+      togglePin(10,11);
+      currentTick[10]=0;
+    }
+  }
+  if (currentPeriod[12]>0){
+    currentTick[12]++;
+    if (currentTick[12] >= currentPeriod[12]){
+      togglePin(12,13);
+      currentTick[12]=0;
+    }
+  }
+  if (currentPeriod[14]>0){
+    currentTick[14]++;
+    if (currentTick[14] >= currentPeriod[14]){
+      togglePin(14,15);
+      currentTick[14]=0;
+    }
+  }
+  if (currentPeriod[16]>0){
+    currentTick[16]++;
+    if (currentTick[16] >= currentPeriod[16]){
+      togglePin(16,17);
+      currentTick[16]=0;
+    }
+  }
   
 }
 
@@ -178,14 +214,33 @@ void reset(byte pin)
   }
   currentPosition[pin] = 0; // We're reset.
   digitalWrite(pin+1,LOW);
-  currentPosition[pin+1] = LOW; // Ready to go forward.
+  currentPosition[pin+1] = 0; // Ready to go forward.
 }
 
 //Resets all the pins
 void resetAll(){
+  
+  // Old one-at-a-time reset
+  //for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
+  //  reset(p);
+  //}
+  
+  // New all-at-once reset
+  for (byte s=0;s<80;s++){ // For max drive's position
+    for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
+      digitalWrite(p+1,HIGH); // Go in reverse
+      digitalWrite(p,HIGH);
+      digitalWrite(p,LOW);
+    }
+    delay(5);
+  }
+  
   for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
-    reset(p);
-  } 
+    currentPosition[p] = 0; // We're reset.
+    digitalWrite(p+1,LOW);
+    currentState[p+1] = 0; // Ready to go forward.
+  }
+  
 }
 
 
