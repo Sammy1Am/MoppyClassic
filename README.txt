@@ -21,7 +21,9 @@ I built Moppy using an Arduino UNO, though it should work just fine on most Ardu
 
 Some pinout information can be found here: http://pinouts.ru/Storage/InternalDisk_pinout.shtml
 
-Make sure you ground the correct drive-select pin, or the drive won't respond to any input.  You can tell when you have the right drive selected, because the light on the front of the drive will come on.  Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the drives will not register the pulses correctly.
+Make sure you ground the correct drive-select pin, or the drive won't respond to any input (just connect the drive-select pin on the floppy to the pin directly below it).  You can tell when you have the right drive selected, because the light on the front of the drive will come on.  
+
+Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the drives will not register the pulses correctly.  To do this, make sure that the GND pin on the Arduino is connected to the odd-numbered pin below the STEP pin on the floppy (i.e. if the STEP pin is 20, connect the Audnio's GND pin to Floppy-pin 19).  You might need to do this for the DIRECTION pin as well (I did it for both, but I don't know if it's required).
 
 
 --CONFIGURAITON / USE--
