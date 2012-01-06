@@ -17,7 +17,7 @@ Upload the included Arduino code to the Arduino of your choice, and open up the 
 
 --HARDWARE--
 
-I built Moppy using an Arduino UNO, though it should work just fine on most Arduinos.  The pins are connected in pairs to floppy drives as follows: Even pins (2,4,6...) are connected to the drive's STEP pin, the matching odd pins (3,5,7...) are connected to the drive's DIRECTION control pin.
+I built Moppy using an Arduino UNO, though it should work just fine on most Arduinos.  The pins are connected in pairs to floppy drives as follows: Even pins (2,4,6...) are connected to each drive's STEP pin, the matching odd pins (3,5,7...) are connected to the each drive's DIRECTION control pin.  So the first floppy would be connected to pin 2 & 3, the second floppy to 4 & 5, and so on.
 
 Some pinout information can be found here: http://pinouts.ru/Storage/InternalDisk_pinout.shtml
 
