@@ -96,7 +96,7 @@ public class MoppyPlayer implements Receiver {
 
                 double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
 
-                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 49152));
+                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
                 //System.out.println(currentPeriod[message.getStatus() - 224] + "-" + period);
                 mb.sendEvent(pin, period);
             }
