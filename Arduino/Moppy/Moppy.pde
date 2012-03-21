@@ -4,7 +4,7 @@ boolean firstRun = true; // Used for one-run-only stuffs;
 
 //First pin being used for floppies, and the last pin.  Used for looping over all pins.
 const byte FIRST_PIN = 2;
-const byte PIN_MAX = 17;
+const byte PIN_MAX = 33;
 #define RESOLUTION 40 //Microsecond resolution for notes
 
 
@@ -20,29 +20,32 @@ are used for control, so only even numbers need a value here.  3.5" Floppies hav
 80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
 half a position (use 158 and 98).
 */
+/* ggppjj: I am unsure if I did it right, but the following lines (through 46) 
+ have been edited to allow for the maximum possible drives.
+ */
 byte MAX_POSITION[] = {
-  0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
+  0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
   
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
 byte currentPosition[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
 
 /*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
 track direction-pins.  LOW = forward, HIGH=reverse
 */
 int currentState[] = {
-  0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW
+  0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW
 };
   
 //Current period assigned to each pin.  0 = off.  Each period is of the length specified by the RESOLUTION
 //variable above.  i.e. A period of 10 is (RESOLUTION x 10) microseconds long.
 unsigned int currentPeriod[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
 //Current tick
 unsigned int currentTick[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
 };
 
 
@@ -66,6 +69,23 @@ void setup(){
   pinMode(15, OUTPUT); // Direction 7
   pinMode(16, OUTPUT); // Step control 8
   pinMode(17, OUTPUT); // Direction 8
+  // ggppjj: Added the pin inits for the maximum possible drives.
+  pinMode(18, OUTPUT); // Step Control 9
+  pinMode(19, OUTPUT); // Direction 9
+  pinMode(20, OUTPUT); // Step Control 10
+  pinMode(21, OUTPUT); // Direction 10
+  pinMode(22, OUTPUT); // Step control 11
+  pinMode(23, OUTPUT); // Direction 11
+  pinMode(24, OUTPUT); // Step control 12
+  pinMode(25, OUTPUT); // Direction 12
+  pinMode(26, OUTPUT); // Step control 13
+  pinMode(27, OUTPUT); // Direction 13
+  pinMode(28, OUTPUT); // Step control 14
+  pinMode(29, OUTPUT); // Direction 14
+  pinMode(30, OUTPUT); // Step control 15
+  pinMode(31, OUTPUT); // Direction 15
+  pinMode(32, OUTPUT); // Step control 16
+  pinMode(33, OUTPUT); // Direction 16
 
   Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
   Timer1.attachInterrupt(tick); // Attach the tick function
@@ -163,7 +183,63 @@ void tick()
       currentTick[16]=0;
     }
   }
-  
+  // ggppjj: Added the if's for the maximum possible drives.
+  if (currentPeriod[18]>0){
+    currentTick[18]++;
+    if (currentTick[18] >= currentPeriod[18]){
+      togglePin(18,19);
+      currentTick[18]=0;
+    }
+  }
+  if (currentPeriod[20]>0){
+    currentTick[20]++;
+    if (currentTick[20] >= currentPeriod[20]){
+      togglePin(20,21);
+      currentTick[20]=0;
+    }
+  }
+  if (currentPeriod[22]>0){
+    currentTick[22]++;
+    if (currentTick[22] >= currentPeriod[22]){
+      togglePin(22,23);
+      currentTick[22]=0;
+    }
+  }
+  if (currentPeriod[24]>0){
+    currentTick[24]++;
+    if (currentTick[24] >= currentPeriod[24]){
+      togglePin(24,25);
+      currentTick[24]=0;
+    }
+  }
+  if (currentPeriod[26]>0){
+    currentTick[26]++;
+    if (currentTick[26] >= currentPeriod[26]){
+      togglePin(26,27);
+      currentTick[26]=0;
+    }
+  }
+  if (currentPeriod[28]>0){
+    currentTick[28]++;
+    if (currentTick[28] >= currentPeriod[28]){
+      togglePin(28,29);
+      currentTick[28]=0;
+    }
+  }
+  if (currentPeriod[30]>0){
+    currentTick[30]++;
+    if (currentTick[30] >= currentPeriod[30]){
+      togglePin(30,31);
+      currentTick[30]=0;
+    }
+  }
+  if (currentPeriod[32]>0){
+    currentTick[32]++;
+    if (currentTick[32] >= currentPeriod[32]){
+      togglePin(32,33);
+      currentTick[32]=0;
+    }
+  }
 }
 
 void togglePin(byte pin, byte direction_pin) {
