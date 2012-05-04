@@ -89,7 +89,10 @@ void loop(){
     //Watch for special 100-message to reset the drives
     if (Serial.peek() == 100) {
       resetAll();
-      Serial.flush();
+      //Flush any remaining messages.
+      while(Serial.available() > 0){
+        Serial.read();
+      }
     } 
     else{
       currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
