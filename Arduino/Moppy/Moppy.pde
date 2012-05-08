@@ -45,8 +45,6 @@ unsigned int currentTick[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
 };
 
-
-
 //Setup pins (Even-odd pairs for step control and direction
 void setup(){
   pinMode(13, OUTPUT);// Pin 13 has an LED connected on most Arduino boards
@@ -73,7 +71,6 @@ void setup(){
   Serial.begin(9600);
 }
 
-
 void loop(){
   
   //The first loop, reset all the drives, and wait 2 seconds...
@@ -89,7 +86,10 @@ void loop(){
     //Watch for special 100-message to reset the drives
     if (Serial.peek() == 100) {
       resetAll();
-      Serial.flush();
+      //Flush any remaining messages.
+      while(Serial.available() > 0){
+        Serial.read();	
+      }
     } 
     else{
       currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
@@ -104,66 +104,18 @@ Called by the timer inturrupt at the specified resolution.
 void tick()
 {
   /* 
-  If there is a period set for control pin 2, count the number of
+  If there is a period set for control pin 2 (4,6,8...), count the number of
   ticks that pass, and toggle the pin if the current period is reached.
   */
-  if (currentPeriod[2]>0){
-    currentTick[2]++;
-    if (currentTick[2] >= currentPeriod[2]){
-      togglePin(2,3);
-      currentTick[2]=0;
+  int i;
+  for(i = 2 ; i < PIN_MAX; i+=2) {
+  	if (currentPeriod[i]>0){
+    currentTick[i]++;
+    if (currentTick[i] >= currentPeriod[i]){
+      togglePin(i,i+1);
+      currentTick[i]=0;
     }
   }
-  if (currentPeriod[4]>0){
-    currentTick[4]++;
-    if (currentTick[4] >= currentPeriod[4]){
-      togglePin(4,5);
-      currentTick[4]=0;
-    }
-  }
-  if (currentPeriod[6]>0){
-    currentTick[6]++;
-    if (currentTick[6] >= currentPeriod[6]){
-      togglePin(6,7);
-      currentTick[6]=0;
-    }
-  }
-  if (currentPeriod[8]>0){
-    currentTick[8]++;
-    if (currentTick[8] >= currentPeriod[8]){
-      togglePin(8,9);
-      currentTick[8]=0;
-    }
-  }
-  if (currentPeriod[10]>0){
-    currentTick[10]++;
-    if (currentTick[10] >= currentPeriod[10]){
-      togglePin(10,11);
-      currentTick[10]=0;
-    }
-  }
-  if (currentPeriod[12]>0){
-    currentTick[12]++;
-    if (currentTick[12] >= currentPeriod[12]){
-      togglePin(12,13);
-      currentTick[12]=0;
-    }
-  }
-  if (currentPeriod[14]>0){
-    currentTick[14]++;
-    if (currentTick[14] >= currentPeriod[14]){
-      togglePin(14,15);
-      currentTick[14]=0;
-    }
-  }
-  if (currentPeriod[16]>0){
-    currentTick[16]++;
-    if (currentTick[16] >= currentPeriod[16]){
-      togglePin(16,17);
-      currentTick[16]=0;
-    }
-  }
-  
 }
 
 void togglePin(byte pin, byte direction_pin) {
@@ -219,11 +171,6 @@ void reset(byte pin)
 
 //Resets all the pins
 void resetAll(){
-  
-  // Old one-at-a-time reset
-  //for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
-  //  reset(p);
-  //}
   
   // New all-at-once reset
   for (byte s=0;s<80;s++){ // For max drive's position

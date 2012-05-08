@@ -13,6 +13,9 @@ import org.jdesktop.application.SingleFrameApplication;
 public class MoppyUI extends SingleFrameApplication{
 
     MoppySequencer ms = null;
+    Keyboard keyboard = null;
+    MoppyPlayer mp = null;
+    MoppyBridge mb = null;
     
     @Override
     protected void startup() {

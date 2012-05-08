@@ -50,57 +50,99 @@ public class MoppyPlayer implements Receiver {
     public void close() {
         mb.close();
     }
+    
+    public void send(MidiMessage message, long timeStamp) {
+        send(message,timeStamp,null);
+    }
 
     //Is called by Java MIDI libraries for each MIDI message encountered.
-    public void send(MidiMessage message, long timeStamp) {
-        if (message.getStatus() > 127 && message.getStatus() < 144) { // Note OFF
+    public void send(MidiMessage message, long timeStamp, MidiInfo info) {
+        
+        if(info == null)
+            info = new MidiInfo(message);
+        
+        if (info.status > 127 && info.status < 144) { // Note OFF
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 127));
+
+            byte pin = (byte) (2 * (info.position));
 
             //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
-            mb.sendEvent(pin, 0);
-            currentPeriod[message.getStatus() - 128] = 0;
-        } else if (message.getStatus() > 143 && message.getStatus() < 160) { // Note ON
+            mb.sendEvent(pin, info.event);
+            currentPeriod[info.status - 128] = 0;
+        } else if (info.status > 143 && info.status < 160) { // Note ON
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 143));
-
-            //Get note number from MIDI message, and look up the period.
-            //NOTE: Java bytes range from -128 to 127, but we need to make them
-            //0-255 to use for lookups.  & 0xFF does the trick.
-
-            // After looking up the period, devide by (the Arduino resolution * 2).
-            // The Arduino's timer will only tick once per X microseconds based on the
-            // resolution.  And each tick will only turn the pin on or off.  So a full
-            // on-off cycle (one step on the floppy) is two periods.
-            int period = microPeriods[(message.getMessage()[1] & 0xff)] / (ARDUINO_RESOLUTION * 2);
-
-            //System.out.println("Got note ON on pin: " + (pin & 0xFF) + " with period " + period);
-            //System.out.println(message.getLength() + " " + message.getMessage()[message.getLength()-1]);
+            byte pin = (byte) (2 * (info.position));
 
             //Zero velocity events turn off the pin.
-            if (message.getMessage()[2] == 0) {
-                mb.sendEvent(pin, 0);
-                currentPeriod[message.getStatus() - 144] = 0;
+            if (info.message[2] == 0) {
+                mb.sendEvent(pin, info.event);
+                currentPeriod[info.status - 144] = 0;
             } else {
-                mb.sendEvent(pin, period);
-                currentPeriod[message.getStatus() - 144] = period;
+                mb.sendEvent(pin, info.period);
+                currentPeriod[info.status - 144] = info.period;
             }
-        } else if (message.getStatus() > 223 && message.getStatus() < 240) { //Pitch bends
+        } else if (info.status > 223 && info.status < 240) { //Pitch bends
             //Only proceed if the note is on (otherwise, no pitch bending)
-            if (currentPeriod[message.getStatus() - 224] != 0) {
+            if (currentPeriod[info.status - 224] != 0) {
                 //Convert the MIDI channel being used to the controller pin on the
                 //Arduino by multipying by 2.
-                byte pin = (byte) (2 * (message.getStatus() - 223));
-
-                double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
-
-                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
+                byte pin = (byte) (2 * (info.status - 223));
                 //System.out.println(currentPeriod[message.getStatus() - 224] + "-" + period);
-                mb.sendEvent(pin, period);
+                mb.sendEvent(pin, info.period);
             }
         }
 
+    }
+    public class MidiInfo {
+        
+        //Corresponds to the note being played
+        public int period;
+        
+        //Information on the amount of pitchbend
+        public double pitchBend;
+        
+        //Position of the floppy drive. Starts at 1 and ends at MAXIMUM_NUMBER_OF_DRIVES
+        public int position;
+        
+        //Description of the MIDI event (1 == ON, 0 = OFF)
+        public int event = 1;
+        
+        public int status;
+        public byte message[];
+
+        public MidiInfo(MidiMessage midiMessage) {
+            status = midiMessage.getStatus();
+            message = midiMessage.getMessage();
+
+            if (status > 127 && status < 144) { // Note OFF
+                position = status - 127;
+                event = 0;
+            } else if (status > 143 && status < 160) { // Note ON
+                position = status - 143;
+
+                //Get note number from MIDI message, and look up the period.
+                //NOTE: Java bytes range from -128 to 127, but we need to make them
+                //0-255 to use for lookups.  & 0xFF does the trick.
+
+                // After looking up the period, devide by (the Arduino resolution * 2).
+                // The Arduino's timer will only tick once per X microseconds based on the
+                // resolution.  And each tick will only turn the pin on or off.  So a full
+                // on-off cycle (one step on the floppy) is two periods.
+                period = microPeriods[(message[1] & 0xff)] / (ARDUINO_RESOLUTION * 2);
+
+                //Zero velocity events turn off the pin.
+                if (message[2] == 0)
+                    event = 0;
+
+            } else if (status > 223 && status < 240) { //Pitch bends
+                //Only proceed if the note is on (otherwise, no pitch bending)
+                if (currentPeriod[status - 224] != 0) {
+                    pitchBend = ((message[2] & 0xff) << 8) + (message[1] & 0xff);
+                    period = (int) (currentPeriod[status - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
+                }
+            }
+        }
     }
 }

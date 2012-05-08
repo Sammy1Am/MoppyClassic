@@ -29,10 +29,10 @@ public class MoppySequencer implements MetaEventListener{
     Sequencer sequencer;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
-    public MoppySequencer(String comPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
-        mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
-        mp = new MoppyPlayer(mb);
-
+    public MoppySequencer(MoppyBridge newBridge, MoppyPlayer newPlayer) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
+        mp = newPlayer;
+        mb = newBridge;
+        
         mb.resetDrives();
 
         sequencer = MidiSystem.getSequencer(false);
@@ -58,7 +58,6 @@ public class MoppySequencer implements MetaEventListener{
         if (sequencer.isOpen()){
                 sequencer.stop();
             }
-        mb.resetDrives();
     }
     
     public void setTempo(float newTempo){
@@ -76,7 +75,6 @@ public class MoppySequencer implements MetaEventListener{
     public void closeSequencer(){
         stopSequencer();
         sequencer.close();
-        mp.close();
     }
 
     public void meta(MetaMessage meta) {
