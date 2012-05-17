@@ -39,6 +39,7 @@ public class MoppyPlayer implements Receiver {
      * by the NOTE ON message; for pitch-bending.
      */
     private int[] currentPeriod = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] currentNotesCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     
     MoppyBridge mb;
     SerialPort com;
@@ -57,14 +58,19 @@ public class MoppyPlayer implements Receiver {
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
             byte pin = (byte) (2 * (message.getStatus() - 127));
+            currentNotesCount[message.getStatus() - 128]--;
 
             //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
-            mb.sendEvent(pin, 0);
-            currentPeriod[message.getStatus() - 128] = 0;
+            if (currentNotesCount[message.getStatus() - 128] == 0)
+            {
+                mb.sendEvent(pin, 0);
+                currentPeriod[message.getStatus() - 128] = 0;    
+            }
         } else if (message.getStatus() > 143 && message.getStatus() < 160) { // Note ON
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
             byte pin = (byte) (2 * (message.getStatus() - 143));
+            currentNotesCount[message.getStatus() - 144]++;
 
             //Get note number from MIDI message, and look up the period.
             //NOTE: Java bytes range from -128 to 127, but we need to make them
@@ -96,7 +102,7 @@ public class MoppyPlayer implements Receiver {
 
                 double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
 
-                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
+                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192) * 2);
                 //System.out.println(currentPeriod[message.getStatus() - 224] + "-" + period);
                 mb.sendEvent(pin, period);
             }
