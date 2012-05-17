@@ -41,6 +41,7 @@ public class MoppySequencer implements MetaEventListener{
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
+        MIDIIn.setReceiver(mp);
         sequencer.getTransmitter().setReceiver(mp); // Set MoppyPlayer as a receiver.
         sequencer.addMetaEventListener(this);
     }
