@@ -17,6 +17,8 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiSystem;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -84,7 +86,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
             app.ms.closeSequencer();
         }
         try {
-            app.ms = new MoppySequencer(comPort);
+            app.ms = new MoppySequencer(comPort, midiPort);
             app.ms.addListener(this);
         } catch (Exception ex) {
             Logger.getLogger(MoppyMainWindow.class.getName()).log(Level.SEVERE, null, ex);
