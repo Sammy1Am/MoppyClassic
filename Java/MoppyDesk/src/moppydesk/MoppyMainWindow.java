@@ -460,7 +460,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
           shutdownSequencer();
     }                                                 
 
-     private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
+    private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
         if (app.ms != null){
             app.ms.closeSequencer();
         }
