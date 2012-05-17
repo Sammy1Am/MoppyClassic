@@ -74,7 +74,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         }
     }
 
-    private void initializeSequencer(String comPort) {
+    private void initializeSequencer(String comPort, int midiPort) {
         statusLabel.setText("Initializing sequencer...");
         if (app.ms != null) {
             app.ms.closeSequencer();
@@ -493,6 +493,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
