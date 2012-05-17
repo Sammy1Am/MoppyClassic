@@ -19,7 +19,7 @@ public class MoppySequencer implements MetaEventListener{
     MoppyBridge mb;
     MoppyPlayer mp;
     Sequencer sequencer;
-    Transmitter MIDIIn;
+    Transmitter midiIn;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
     public MoppySequencer(String comPort, int midiPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
@@ -34,14 +34,14 @@ public class MoppySequencer implements MetaEventListener{
             device = MidiSystem.getMidiDevice(infos[midiPort]);
             System.out.println ("MIDI port selected: "+ midiPort);
             device.open();
-            MIDIIn = device.getTransmitter();
+            midiIn = device.getTransmitter();
         } catch (MidiUnavailableException e) {
             System.out.println ("MIDI port error: "+ midiPort);
         }
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
-        MIDIIn.setReceiver(mp);
+        midiIn.setReceiver(mp);
         sequencer.getTransmitter().setReceiver(mp); // Set MoppyPlayer as a receiver.
         sequencer.addMetaEventListener(this);
     }
