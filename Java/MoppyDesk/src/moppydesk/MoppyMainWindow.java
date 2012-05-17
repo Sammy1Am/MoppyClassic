@@ -29,8 +29,10 @@ import javax.swing.JSlider;
 public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusConsumer {
 
     static String PREF_COM_PORT = "comPort";
+    static String PREF_MIDI_PORT = "midiPort";
     static String PREF_LOADED_SEQ = "loadedSequencePath";
     MoppyUI app;
+    int midiPort;
     Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
     final JFileChooser sequenceChooser = new JFileChooser();
     boolean comboBoxReady = false;
@@ -41,6 +43,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         initComponents();
 
         updateComSelectionMenu();
+        updateMidiSelectionMenu();
 
         statusLabel.setText("Ready");
 
@@ -58,6 +61,21 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         }
         comSelectionMenu.setSelectedItem(prefs.get(PREF_COM_PORT, ""));
         comboBoxReady = true;
+    }
+    
+    private void midiSelectionMenuActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+          JComboBox cb = (JComboBox) evt.getSource();
+          midiPort =  (int) cb.getSelectedIndex();
+          shutdownSequencer();
+    }                                                 
+
+    private void updateMidiSelectionMenu() {
+        midiSelectionMenu.removeAllItems();
+        Info[] e = MidiSystem.getMidiDeviceInfo();
+        for (Info device : e)
+        {
+            midiSelectionMenu.addItem(device.getName());
+        }
     }
 
     private void initializeSequencer(String comPort) {
@@ -450,6 +468,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bpmLabel;
     private javax.swing.JComboBox comSelectionMenu;
+    private javax.swing.JComboBox midiSelectionMenu;
     private javax.swing.JButton connectSeqButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
