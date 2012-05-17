@@ -65,12 +65,6 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         comboBoxReady = true;
     }
     
-    private void midiSelectionMenuActionPerformed(java.awt.event.ActionEvent evt) {                                                  
-          JComboBox cb = (JComboBox) evt.getSource();
-          midiPort =  (int) cb.getSelectedIndex();
-          shutdownSequencer();
-    }                                                 
-
     private void updateMidiSelectionMenu() {
         midiSelectionMenu.removeAllItems();
         Info[] e = MidiSystem.getMidiDeviceInfo();
@@ -142,6 +136,8 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        midiSelectionMenu = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MoppyDesk");
@@ -346,6 +342,16 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         jLabel3.setText("Arduino Port:");
         jLabel3.setName("jLabel3"); // NOI18N
 
+        jLabel4.setText("MIDI Device");
+        jLabel4.setName("jLabel4");
+
+        midiSelectionMenu.setName("midiSelectionMenu");
+        midiSelectionMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                midiSelectionMenuActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -360,6 +366,10 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(58, 58, 58)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(midiSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -369,6 +379,8 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
+                    .addComponent(jLabel4)
+                    .addComponent(midiSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jTabbedPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -439,7 +451,13 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         }
     }//GEN-LAST:event_comPortSelected
 
-    private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
+    private void midiSelectionMenuActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+          JComboBox cb = (JComboBox) evt.getSource();
+          midiPort =  (int) cb.getSelectedIndex();
+          shutdownSequencer();
+    }                                                 
+
+     private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
         if (app.ms != null){
             app.ms.closeSequencer();
         }
@@ -447,7 +465,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
 
     private void connectSequencerPressed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectSequencerPressed
         if (connectSeqButton.getText().equals("Connect")) {
-            initializeSequencer((String) comSelectionMenu.getSelectedItem());
+            initializeSequencer((String) comSelectionMenu.getSelectedItem(), midiPort);
         } else {
             shutdownSequencer();
         }
