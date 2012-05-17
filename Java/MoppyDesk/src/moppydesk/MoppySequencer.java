@@ -27,13 +27,25 @@ public class MoppySequencer implements MetaEventListener{
     MoppyBridge mb;
     MoppyPlayer mp;
     Sequencer sequencer;
+    Transmitter MIDIIn;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
-    public MoppySequencer(String comPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
+    public MoppySequencer(String comPort, int midiPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
         mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
         mp = new MoppyPlayer(mb);
 
         mb.resetDrives();
+
+        MidiDevice device;
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+        try {
+            device = MidiSystem.getMidiDevice(infos[midiPort]);
+            System.out.println ("MIDI port selected: "+ midiPort);
+            device.open();
+            MIDIIn = device.getTransmitter();
+        } catch (MidiUnavailableException e) {
+            System.out.println ("MIDI port error: "+ midiPort);
+        }
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
