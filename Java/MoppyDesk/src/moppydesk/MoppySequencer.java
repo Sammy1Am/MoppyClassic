@@ -36,7 +36,7 @@ public class MoppySequencer implements MetaEventListener{
             device.open();
             midiIn = device.getTransmitter();
             midiIn.setReceiver(mp);
-       } catch (MidiUnavailableException e) {
+        } catch (MidiUnavailableException e) {
             System.out.println ("MIDI port error: "+ midiPort);
         }
 
