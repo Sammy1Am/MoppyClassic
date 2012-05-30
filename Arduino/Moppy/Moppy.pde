@@ -109,11 +109,12 @@ void tick()
   */
   int i;
   for(i = 2 ; i < PIN_MAX; i+=2) {
-  	if (currentPeriod[i]>0){
-    currentTick[i]++;
-    if (currentTick[i] >= currentPeriod[i]){
-      togglePin(i,i+1);
-      currentTick[i]=0;
+    if (currentPeriod[i]>0){
+      currentTick[i]++;
+      if (currentTick[i] >= currentPeriod[i]){
+        togglePin(i,i+1);
+        currentTick[i]=0;
+      }
     }
   }
 }
