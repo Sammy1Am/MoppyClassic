@@ -106,11 +106,13 @@ public class MoppyPlayer implements Receiver {
         //Position of the floppy drive. Starts at 1 and ends at MAXIMUM_NUMBER_OF_DRIVES
         public int position;
         
-        //Description of the MIDI event (1 == ON, 0 = OFF)
+        //Description of the MIDI event
         public int event = 1;
         
         public int status;
         public byte message[];
+        
+        public boolean noteOn = false;
 
         public MidiInfo(MidiMessage midiMessage) {
             status = midiMessage.getStatus();
@@ -121,6 +123,7 @@ public class MoppyPlayer implements Receiver {
                 event = 0;
             } else if (status > 143 && status < 160) { // Note ON
                 position = status - 143;
+                noteOn = true;
 
                 //Get note number from MIDI message, and look up the period.
                 //NOTE: Java bytes range from -128 to 127, but we need to make them
@@ -133,12 +136,15 @@ public class MoppyPlayer implements Receiver {
                 period = microPeriods[(message[1] & 0xff)] / (ARDUINO_RESOLUTION * 2);
 
                 //Zero velocity events turn off the pin.
-                if (message[2] == 0)
+                if (message[2] == 0) {
                     event = 0;
+                    noteOn = false;
+                }
 
             } else if (status > 223 && status < 240) { //Pitch bends
                 //Only proceed if the note is on (otherwise, no pitch bending)
                 if (currentPeriod[status - 224] != 0) {
+                    noteOn = true;
                     pitchBend = ((message[2] & 0xff) << 8) + (message[1] & 0xff);
                     period = (int) (currentPeriod[status - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
                 }

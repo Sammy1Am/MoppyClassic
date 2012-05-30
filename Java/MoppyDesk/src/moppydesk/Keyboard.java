@@ -1,13 +1,8 @@
 package moppydesk;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.Receiver;
-import javax.sound.midi.Transmitter;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiMessage;
+import javax.sound.midi.*;
 
 /**
- *
  * @author miguelduarte42
  */
 public class Keyboard implements Receiver{
@@ -18,13 +13,13 @@ public class Keyboard implements Receiver{
     
     private int numberOfDrives = 5;
     
-    private int currentMode;    
+    private int currentMode = 0;
     private int currentNoteIndex = 0;
     private int[] notes = new int[numberOfDrives];
     
-    private int currentNote;
+    private int noteCount = 0;
     
-    public static String[] MODES = {"Single Channel", "Balanced", "Round Robin"}; 
+    public static String[] MODES = {"Single Channel", "Round Robin"}; 
     
     public Keyboard(String deviceName, MoppyPlayer mp) {
         try {
@@ -64,9 +59,6 @@ public class Keyboard implements Receiver{
                 sendSingleChannel(mm,l,info);
                 break;
             case 1:
-                sendBalanced(mm,l,info);
-                break;
-            case 2:
                 sendRoundRobin(mm,l,info);
                 break;
             default:
@@ -79,38 +71,26 @@ public class Keyboard implements Receiver{
      */
     private void sendSingleChannel(MidiMessage mm, long l,  MoppyPlayer.MidiInfo info) {
         
-        if(info.event > 0) { //Note ON
-            
-            //We need to silence the previous note, in case it is still being played
-            
-            //Save the correct value so we can send it later
-            //and send the STOP message to all the drives
-            int previousEvent = info.event;
-            info.event = 0;
-            for(int i = 1 ; i <= numberOfDrives ; i++) {
-                info.position = i;
-                mp.send(mm, l, info);
+        //Keep track of the notes that are being played. This is necessary in cases
+        //where you press two keys, and then release one of them
+        if(info.noteOn)
+            noteCount++;
+        else
+            noteCount--;
+        
+        if(info.event == 0) {
+            if(noteCount == 0) {
+                for(int i = 1 ; i <= MoppyBridge.MAX_DRIVES ; i++) {
+                    info.position = i;
+                    mp.send(mm, l, info);
+                }
             }
-            
-            //Restore the correct value and
-            //send the ON message to all the drives
-            info.event = previousEvent;
-            for(int i = 1 ; i <= numberOfDrives ; i++) {
-                info.position = i;
-                mp.send(mm, l, info);
-            }
-            
+        }else{
+            for(int i = 1 ; i <= MoppyBridge.MAX_DRIVES ; i++) {
+                    info.position = i;
+                    mp.send(mm, l, info);
+                }
         }
-    }
-    
-    /*
-     * This selection mode will try to maximize the number of drives playing at the same time,
-     * increasing the total volume. If you have 6 drives and are playing just 1 note, all the
-     * drives will play that note. If you then play another note at the same time, this mode
-     * will allocate 3 of the 6 drives to play each of the 2 notes.
-     */
-    private void sendBalanced(MidiMessage mm, long l,  MoppyPlayer.MidiInfo info) {
-        //TODO
     }
     
     /*
@@ -121,32 +101,44 @@ public class Keyboard implements Receiver{
      */
     private void sendRoundRobin(MidiMessage mm, long l,  MoppyPlayer.MidiInfo info) {
         
-        if(info.event > 0) { //if note ON
+        if(info.noteOn) {
             
-            notes[currentNoteIndex] = info.period;
+            boolean freeSpot = false;
             
-            //pins start at 1
-            info.position = currentNoteIndex+1;
-            
-            //prepare the index for the next note (loops around the notes array)
-            currentNoteIndex = (currentNoteIndex+1) % notes.length;
-            
-        } else { //if note OFF
-            
-            for(int i = 0 ; i < notes.length; i++) { 
-                
-                //found the note to turn off, and its corresponding drive
-                if(notes[i] == info.period) {
-                    
-                    //send this particular message to the correct drive
-                    info.position = i+1;
-                    
-                    //reset the stored value for this note
-                    notes[i+1] = 0;
+            //Try to find a drive that is currently silenced
+            for(int i = 0 ; i < notes.length ; i++) {
+                if(notes[i] == 0) {
+                    freeSpot = true;
+                    currentNoteIndex = i;
+                    break;
                 }
             }
             
+            //If every drive is busy, just select the next one
+            if(!freeSpot)
+                currentNoteIndex = (currentNoteIndex+1) % notes.length;
+            
+            //Save the position of the current note so we can silence the drive later
+            notes[currentNoteIndex] = info.message[1];
+            
+            //Pins start at 1, not 0
+            info.position = currentNoteIndex+1;
+            
+        } else { //if note OFF
+            for(int i = 0 ; i < notes.length; i++) { 
+                
+                if(notes[i] == info.message[1]) {
+                    //Found the note to turn off, and its corresponding drive (drives start at 1, not 0)
+                    info.position = i+1;
+                    
+                    //Reset the stored value for this note, since the drive will be silenced
+                    notes[i] = 0;
+                    break;
+                }
+            }
         }
+        
+        mp.send(mm, l, info);
     }
 
     public void close() {

@@ -104,6 +104,12 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     }
 
     private void shutdownSequencer() {
+        if(app.mb != null)
+            app.mb.silenceDrives();
+        if(app.keyboard != null){
+            app.keyboard.close();
+            app.keyboard = null;
+        }
         statusLabel.setText("Closing sequencer...");
         if (app.ms != null) {
             app.ms.closeSequencer();
@@ -488,6 +494,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
                 app.mb = new MoppyBridge((String) comSelectionMenu.getSelectedItem());
                 
                 app.mp = new MoppyPlayer(app.mb);
+                
                 initializeSequencer();
                 initializeKeyboard();
             } else {

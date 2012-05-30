@@ -1,10 +1,6 @@
 package moppydesk;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.UnsupportedCommOperationException;
+import gnu.io.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
@@ -16,8 +12,7 @@ import java.util.logging.Logger;
  */
 public class MoppyBridge {
 
-    static int FIRST_PIN = 2;
-    static int MAX_PIN = 17;
+    static int MAX_DRIVES = 8;
     
     int SERIAL_RATE = 9600;
     OutputStream os;
@@ -62,10 +57,11 @@ public class MoppyBridge {
     /**
      * Sends a '0' period to all drives to silence them.
      */
-    private void silenceDrives(){
+    public void silenceDrives(){
         // Stop notes
-        for (int d=FIRST_PIN;d<=MAX_PIN;d+=2){
-            sendArray(new byte[] {(byte)d,(byte)0,(byte)0});
+        for (int d=0;d <= MAX_DRIVES; d++){
+            int pin = 2+d*2;
+            sendArray(new byte[] {(byte)pin,(byte)0,(byte)0});
         }
     }
 
