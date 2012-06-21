@@ -67,6 +67,18 @@ public class MoppySequencer implements MetaEventListener{
         sequencer.setTempoInBPM(newTempo);
     }
     
+    public long getSecondsLength(){
+        return sequencer.getMicrosecondLength()/1000000;
+    }
+    
+    public long getSecondsPosition(){
+        return sequencer.getMicrosecondPosition()/1000000;
+    }
+    
+    public void setSecondsPosition(long seconds){
+        sequencer.setMicrosecondPosition(seconds*1000000);
+    }
+    
     public void addListener(MoppyStatusConsumer newListener){
         listeners.add(newListener);
     }

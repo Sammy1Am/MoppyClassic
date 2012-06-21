@@ -4,12 +4,16 @@
  */
 package moppydesk.ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
+import javax.swing.Timer;
 import moppydesk.*;
 
 /**
@@ -23,6 +27,8 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
     MoppyUI app;
     final JFileChooser sequenceChooser = new JFileChooser();
     
+    Timer progressTimer;
+    
     /**
      * Creates new form SequencerControls
      */
@@ -32,6 +38,23 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
         this.controlWindow = mcw;
         
         initComponents();
+        
+        progressTimer = new Timer(1000, new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                long currentSeconds = seq.getSecondsPosition();
+                sequenceProgressSlider.setValue((int)(currentSeconds));
+                String currentPosition = String.format("%d:%02d", 
+                        TimeUnit.SECONDS.toMinutes(currentSeconds),
+                        currentSeconds%60);
+                String totalPosition = String.format("%d:%02d", 
+                        TimeUnit.SECONDS.toMinutes(seq.getSecondsLength()),
+                        seq.getSecondsLength()%60);
+                currentPositionLabel.setText(currentPosition);
+                totalPositionLabel.setText(totalPosition);
+            }
+        });
+        
+        progressTimer.start();
     }
 
     /**
@@ -50,6 +73,9 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
         startButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
         loadButton = new javax.swing.JButton();
+        sequenceProgressSlider = new javax.swing.JSlider();
+        currentPositionLabel = new javax.swing.JLabel();
+        totalPositionLabel = new javax.swing.JLabel();
 
         jLabel1.setText("Current Sequence:");
 
@@ -89,28 +115,53 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
             }
         });
 
+        sequenceProgressSlider.setToolTipText("");
+        sequenceProgressSlider.setValue(0);
+        sequenceProgressSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sequenceProgressDragged(evt);
+            }
+        });
+        sequenceProgressSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                sequenceProgressDragged(evt);
+            }
+        });
+
+        currentPositionLabel.setText("00:00");
+
+        totalPositionLabel.setText("00:00");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sequenceNameLabel)
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(loadButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(126, 126, 126)
+                        .addComponent(bpmLabel)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(startButton)
+                        .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(stopButton))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(136, 136, 136)
-                .addComponent(bpmLabel))
+                        .addComponent(stopButton))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(currentPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sequenceProgressSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(totalPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,22 +169,27 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(sequenceNameLabel))
-                            .addComponent(loadButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sequenceNameLabel))
+                    .addComponent(loadButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(26, 26, 26)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(stopButton)
                                 .addComponent(startButton))
-                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())
+                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(bpmLabel)
-                        .addGap(54, 54, 54))))
+                        .addGap(43, 43, 43)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(sequenceProgressSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(currentPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(totalPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -159,6 +215,7 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
         controlWindow.setStatus("Stopping...");
         seq.stopSequencer();
         seq.resetSequencer();
+        startButton.setText("Start");
         controlWindow.setStatus("Stopped and Reset.");
     }//GEN-LAST:event_stopButtonstopResetClicked
 
@@ -176,6 +233,14 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
         }
     }//GEN-LAST:event_loadButtonloadSequence
 
+    private void sequenceProgressDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sequenceProgressDragged
+        int seconds = ((JSlider)evt.getSource()).getValue();
+        seq.setSecondsPosition(seconds);
+        currentPositionLabel.setText(String.format("%d:%02d", 
+                        TimeUnit.SECONDS.toMinutes(seconds),
+                        seconds%60));
+    }//GEN-LAST:event_sequenceProgressDragged
+
     public void tempoChanged(int newTempo) {
         jSlider1.setValue(newTempo);
         bpmLabel.setText(newTempo + " bpm");
@@ -186,6 +251,7 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
             controlWindow.setStatus("Loading file...");
             seq.loadFile(sequenceFile.getPath());
             sequenceNameLabel.setText(sequenceFile.getName());
+            sequenceProgressSlider.setMaximum((int)(seq.getSecondsLength()));
             app.prefs.put(Constants.PREF_LOADED_SEQ, sequenceFile.getPath());
             controlWindow.setStatus("Loaded " + sequenceFile.getName());
             startButton.setEnabled(true);
@@ -198,11 +264,14 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bpmLabel;
+    private javax.swing.JLabel currentPositionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JButton loadButton;
     private javax.swing.JLabel sequenceNameLabel;
+    private javax.swing.JSlider sequenceProgressSlider;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
+    private javax.swing.JLabel totalPositionLabel;
     // End of variables declaration//GEN-END:variables
 }
