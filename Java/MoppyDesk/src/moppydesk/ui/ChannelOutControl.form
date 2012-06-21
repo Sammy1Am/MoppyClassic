@@ -87,7 +87,7 @@
     <Component class="javax.swing.JComboBox" name="comComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new DefaultComboBoxModel(MoppyBridge.getAvailableCOMPorts())" type="code"/>
+          <Connection code="new DefaultComboBoxModel(moppydesk.MoppyCOMBridge.getAvailableCOMPorts())" type="code"/>
         </Property>
       </Properties>
       <Events>

@@ -4,6 +4,10 @@
  */
 package moppydesk.ui;
 
+import moppydesk.inputs.MoppySequencer;
+import moppydesk.outputs.MoppyMIDIOutput;
+import moppydesk.outputs.MoppyCOMBridge;
+import moppydesk.outputs.MoppyPlayerOutput;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
@@ -36,7 +40,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
      */
     public MoppyControlWindow(MoppyUI app) {
         this.app = app;
-        availableMIDIOuts = MoppyMIDIBridge.getMIDIOutInfos();
+        availableMIDIOuts = MoppyMIDIOutput.getMIDIOutInfos();
         loadOutputSettings();
 
         initComponents();
@@ -211,14 +215,14 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                 // MoppyPlayer/Receivers are grouped by COM port
                 if (os.type.equals(OutputSetting.OutputType.MOPPY)) {
                     if (!outputPlayers.containsKey(os.comPort)){
-                        outputPlayers.put(os.comPort, new MoppyPlayer(new MoppyBridge(os.comPort)));
+                        outputPlayers.put(os.comPort, new MoppyPlayerOutput(new MoppyCOMBridge(os.comPort)));
                     }
                     app.outputReceivers[ch] = outputPlayers.get(os.comPort);
                 } 
                 //MIDIPlayer/Receivers are grouped by MIDI output name
                 else if (os.type.equals(OutputSetting.OutputType.MIDI)) {
                     if (!outputPlayers.containsKey(os.midiDeviceName)){
-                        outputPlayers.put(os.midiDeviceName, new MoppyMIDIBridge(os.midiDeviceName));
+                        outputPlayers.put(os.midiDeviceName, new MoppyMIDIOutput(os.midiDeviceName));
                     }
                     app.outputReceivers[ch] = outputPlayers.get(os.midiDeviceName);
                 }

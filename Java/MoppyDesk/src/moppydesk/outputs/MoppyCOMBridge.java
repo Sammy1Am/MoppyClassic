@@ -1,4 +1,4 @@
-package moppydesk;
+package moppydesk.outputs;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Sammy1Am
  */
-public class MoppyBridge {
+public class MoppyCOMBridge {
 
     static int FIRST_PIN = 2;
     static int MAX_PIN = 17;
@@ -25,7 +25,7 @@ public class MoppyBridge {
     SerialPort com;
     private boolean isOutputOpen = false;
 
-    public MoppyBridge(String portName) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
+    public MoppyCOMBridge(String portName) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
         CommPortIdentifier cpi = CommPortIdentifier.getPortIdentifier(portName);
         com = (SerialPort) cpi.open("MoppyDesk", 2000);
         com.setSerialPortParams(SERIAL_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
@@ -60,7 +60,7 @@ public class MoppyBridge {
             os.write(message);
             os.flush();
         } catch (IOException ex) {
-            Logger.getLogger(MoppyBridge.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MoppyCOMBridge.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -84,7 +84,7 @@ public class MoppyBridge {
             try {
                 Thread.sleep(500); // Give the drives time to reset
             } catch (InterruptedException ex) {
-                Logger.getLogger(MoppyBridge.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MoppyCOMBridge.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -97,7 +97,7 @@ public class MoppyBridge {
             try {
                 os.close();
             } catch (IOException ex) {
-                Logger.getLogger(MoppyBridge.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MoppyCOMBridge.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

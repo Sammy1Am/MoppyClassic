@@ -1,4 +1,4 @@
-package moppydesk;
+package moppydesk.inputs;
 
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -17,6 +17,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
+import moppydesk.MoppyStatusConsumer;
 
 /**
  *

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package moppydesk;
+package moppydesk.outputs;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -14,12 +14,12 @@ import javax.sound.midi.MidiDevice.Info;
  *
  * @author Sam
  */
-public class MoppyMIDIBridge implements Receiver{
+public class MoppyMIDIOutput implements Receiver{
     
     MidiDevice device;
     Receiver deviceReceiver;
     
-    public MoppyMIDIBridge(String midiDeviceName) throws MidiUnavailableException{
+    public MoppyMIDIOutput(String midiDeviceName) throws MidiUnavailableException{
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
         for (Info i : infos){
             try {
@@ -27,7 +27,7 @@ public class MoppyMIDIBridge implements Receiver{
                     this.device = MidiSystem.getMidiDevice(i);
                 }
             } catch (MidiUnavailableException ex) {
-                Logger.getLogger(MoppyMIDIBridge.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MoppyMIDIOutput.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
@@ -46,7 +46,7 @@ public class MoppyMIDIBridge implements Receiver{
                     outInfos.put(i.getName(), i);
                 }
             } catch (MidiUnavailableException ex) {
-                Logger.getLogger(MoppyMIDIBridge.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MoppyMIDIOutput.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return outInfos;

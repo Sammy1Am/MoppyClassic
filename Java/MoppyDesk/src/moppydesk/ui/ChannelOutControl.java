@@ -9,7 +9,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
-import moppydesk.MoppyBridge;
+import moppydesk.outputs.MoppyCOMBridge;
 import moppydesk.OutputSetting;
 import moppydesk.OutputSetting.OutputType;
 
@@ -121,7 +121,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
             }
         });
 
-        comComboBox.setModel(new DefaultComboBoxModel(MoppyBridge.getAvailableCOMPorts()));
+        comComboBox.setModel(new DefaultComboBoxModel(MoppyCOMBridge.getAvailableCOMPorts()));
         comComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comComboBoxActionPerformed(evt);

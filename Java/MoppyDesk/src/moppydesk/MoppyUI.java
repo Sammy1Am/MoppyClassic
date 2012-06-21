@@ -4,6 +4,7 @@
  */
 package moppydesk;
 
+import moppydesk.inputs.MoppySequencer;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
