@@ -45,12 +45,11 @@ public class MoppyPlayer implements Receiver {
 
     public MoppyPlayer(MoppyBridge newMb) {
         mb = newMb;
-        mb.resetDrives();
     }
 
     public void close() {
-        mb.resetDrives();
-        mb.close();
+            mb.resetDrives();
+            mb.close();
     }
 
     //Is called by Java MIDI libraries for each MIDI message encountered.
