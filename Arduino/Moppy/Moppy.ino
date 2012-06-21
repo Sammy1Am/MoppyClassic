@@ -9,31 +9,31 @@ const byte PIN_MAX = 17;
 
 
 /*NOTE: Many of the arrays below contain unused indexes.  This is 
-to prevent the Arduino from having to convert a pin input to an alternate
-array index and save as many cycles as possible.  In other words information 
-for pin 2 will be stored in index 2, and information for pin 4 will be 
-stored in index 4.*/
+ to prevent the Arduino from having to convert a pin input to an alternate
+ array index and save as many cycles as possible.  In other words information 
+ for pin 2 will be stored in index 2, and information for pin 4 will be 
+ stored in index 4.*/
 
 
 /*An array of maximum track positions for each step-control pin.  Even pins
-are used for control, so only even numbers need a value here.  3.5" Floppies have
-80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
-half a position (use 158 and 98).
-*/
+ are used for control, so only even numbers need a value here.  3.5" Floppies have
+ 80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
+ half a position (use 158 and 98).
+ */
 byte MAX_POSITION[] = {
   0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
-  
+
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
 byte currentPosition[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 /*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
-track direction-pins.  LOW = forward, HIGH=reverse
-*/
+ track direction-pins.  LOW = forward, HIGH=reverse
+ */
 int currentState[] = {
   0,0,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW
 };
-  
+
 //Current period assigned to each pin.  0 = off.  Each period is of the length specified by the RESOLUTION
 //variable above.  i.e. A period of 10 is (RESOLUTION x 10) microseconds long.
 unsigned int currentPeriod[] = {
@@ -75,7 +75,7 @@ void setup(){
 
 
 void loop(){
-  
+
   //The first loop, reset all the drives, and wait 2 seconds...
   if (firstRun)
   {
@@ -103,13 +103,13 @@ void loop(){
 
 /*
 Called by the timer inturrupt at the specified resolution.
-*/
+ */
 void tick()
 {
   /* 
-  If there is a period set for control pin 2, count the number of
-  ticks that pass, and toggle the pin if the current period is reached.
-  */
+   If there is a period set for control pin 2, count the number of
+   ticks that pass, and toggle the pin if the current period is reached.
+   */
   if (currentPeriod[2]>0){
     currentTick[2]++;
     if (currentTick[2] >= currentPeriod[2]){
@@ -166,11 +166,11 @@ void tick()
       currentTick[16]=0;
     }
   }
-  
+
 }
 
 void togglePin(byte pin, byte direction_pin) {
-  
+
   //Switch directions if end has been reached
   if (currentPosition[pin] >= MAX_POSITION[pin]) {
     currentState[direction_pin] = HIGH;
@@ -180,15 +180,15 @@ void togglePin(byte pin, byte direction_pin) {
     currentState[direction_pin] = LOW;
     digitalWrite(direction_pin,LOW);
   }
-  
-    //Update currentPosition
+
+  //Update currentPosition
   if (currentState[direction_pin] == HIGH){
     currentPosition[pin]--;
   } 
   else {
     currentPosition[pin]++;
   }
-  
+
   //Pulse the control pin
   digitalWrite(pin,currentState[pin]);
   currentState[pin] = ~currentState[pin];
@@ -222,12 +222,17 @@ void reset(byte pin)
 
 //Resets all the pins
 void resetAll(){
-  
+
   // Old one-at-a-time reset
   //for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
   //  reset(p);
   //}
-  
+
+  //Stop all notes (don't want to be playing during/after reset)
+  for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
+    currentPeriod[p] = 0; // Stop playing notes
+  }
+
   // New all-at-once reset
   for (byte s=0;s<80;s++){ // For max drive's position
     for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
@@ -237,14 +242,11 @@ void resetAll(){
     }
     delay(5);
   }
-  
+
   for (byte p=FIRST_PIN;p<=PIN_MAX;p+=2){
     currentPosition[p] = 0; // We're reset.
     digitalWrite(p+1,LOW);
     currentState[p+1] = 0; // Ready to go forward.
   }
-  
+
 }
-
-
-
