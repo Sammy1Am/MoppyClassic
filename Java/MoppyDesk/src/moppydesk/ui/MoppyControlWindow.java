@@ -230,7 +230,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
     
     private void disableInputDevice(){
-        app.ms.closeSequencer();
+        if (app.ms!=null){
+            app.ms.closeSequencer();
+        }
         mainInputPanel.removeAll();
         mainInputPanel.repaint();
         inputSelectBox.setEnabled(true);
