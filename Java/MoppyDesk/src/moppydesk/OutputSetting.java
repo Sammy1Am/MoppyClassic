@@ -4,19 +4,22 @@
  */
 package moppydesk;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sam
  */
-public class OutputSettings {
+public class OutputSetting implements Serializable{
     public enum OutputType {MOPPY, MIDI};
     
     public final int MIDIChannel;
+    public boolean enabled = false;
     public OutputType type = OutputType.MOPPY;
     public String comPort;
     public String midiDeviceName;
     
-    public OutputSettings(int MIDIChannel){
+    public OutputSetting(int MIDIChannel){
         this.MIDIChannel = MIDIChannel;
     }
 }
