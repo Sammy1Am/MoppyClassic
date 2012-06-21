@@ -32,7 +32,6 @@ public class MoppyUI extends SingleFrameApplication{
     
     @Override
     protected void startup() {
-        //MoppyMainWindow mainWindow = new MoppyMainWindow(this);
         MoppyControlWindow mainWindow = new MoppyControlWindow(this);
         show(mainWindow);
     }
