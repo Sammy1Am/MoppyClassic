@@ -7,6 +7,7 @@ package moppydesk.ui;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
+import java.awt.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -163,7 +164,11 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         try {
             
             //Disable and save output settings...
-            //TODO Disable output controls
+            for (Component c : mainOutputPanel.getComponents()){
+                if (c instanceof ChannelOutControl){
+                    ((ChannelOutControl)c).lockControl();
+                }
+            }
             app.putPreferenceObject(Constants.PREF_OUTPUT_SETTINGS, outputSettings);
             app.savePreferences();
             
@@ -185,7 +190,11 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         setStatus("Disconnecting...");
         app.rm.close();
         //Reenable output settings
-        //TODO Enable output controls
+        for (Component c : mainOutputPanel.getComponents()){
+                if (c instanceof ChannelOutControl){
+                    ((ChannelOutControl)c).unlockControl();
+                }
+            }
         
         setStatus("Disconnected.");
     }

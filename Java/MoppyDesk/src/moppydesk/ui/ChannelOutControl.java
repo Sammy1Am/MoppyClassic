@@ -4,9 +4,11 @@
  */
 package moppydesk.ui;
 
+import java.awt.event.ActionEvent;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JRadioButton;
 import moppydesk.MoppyBridge;
 import moppydesk.OutputSetting;
 import moppydesk.OutputSetting.OutputType;
@@ -19,7 +21,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
 
     private OutputSetting settings;
     private MoppyControlWindow controlWindow;
-    
+
     /**
      * Creates new form ChannelOutControl
      */
@@ -30,36 +32,57 @@ public class ChannelOutControl extends javax.swing.JPanel {
         loadSettings();
     }
 
-    private void loadSettings(){
-        
-        enabledCB.setSelected(settings.enabled);
-        
-        if (settings.type.equals(OutputType.MOPPY)){
+    private void loadSettings() {
+
+        if (settings.enabled) {
+            enabledCB.setSelected(true);
+            enableControls();
+        } else {
+            enabledCB.setSelected(false);
+            disableControls();
+        }
+
+
+        if (settings.type.equals(OutputType.MOPPY)) {
             //outputTypeRB.setSelected(moppyTypeRB.getModel(), true);
             moppyTypeRB.doClick();
         } else {
             //outputTypeRB.setSelected(MIDITypeRB.getModel(), true);
             MIDITypeRB.doClick();
         }
-        
+
         comComboBox.setSelectedItem(settings.comPort);
         midiOutComboBox.setSelectedItem(settings.midiDeviceName);
     }
-    
-    private void outputTypeChanged(java.awt.event.ActionEvent evt){
-        if (evt.getActionCommand().equalsIgnoreCase("Moppy")){
-            settings.type = OutputType.MOPPY;
-            midiOutLabel.setEnabled(false);
-            midiOutComboBox.setEnabled(false);
-            comComboBox.setEnabled(true);
-        } else {
-            settings.type = OutputType.MIDI;
-            comComboBox.setEnabled(false);
-            midiOutLabel.setEnabled(true);
-            midiOutComboBox.setEnabled(true);
-        }
+
+    public void lockControl(){
+        enabledCB.setEnabled(false);
+        disableControls();
     }
     
+    public void unlockControl(){
+        enabledCB.setEnabled(true);
+        enableControls();
+    }
+    
+    private void disableControls() {
+        moppyTypeRB.setEnabled(false);
+        MIDITypeRB.setEnabled(false);
+        comComboBox.setEnabled(false);
+        midiOutComboBox.setEnabled(false);
+    }
+
+    private void enableControls() {
+        moppyTypeRB.setEnabled(true);
+        MIDITypeRB.setEnabled(true);
+        if (moppyTypeRB.isSelected()){
+            outputTypeChanged(new ActionEvent(moppyTypeRB, ActionEvent.ACTION_PERFORMED, moppyTypeRB.getActionCommand()));
+        } else if (MIDITypeRB.isSelected()){
+            outputTypeChanged(new ActionEvent(MIDITypeRB, ActionEvent.ACTION_PERFORMED, MIDITypeRB.getActionCommand()));
+        }
+        
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,17 +180,35 @@ public class ChannelOutControl extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comComboBoxActionPerformed
-        settings.comPort = (String)((JComboBox)evt.getSource()).getSelectedItem();
+        settings.comPort = (String) ((JComboBox) evt.getSource()).getSelectedItem();
     }//GEN-LAST:event_comComboBoxActionPerformed
 
     private void midiOutComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_midiOutComboBoxActionPerformed
-        settings.midiDeviceName = (String)((JComboBox)evt.getSource()).getSelectedItem();
+        settings.midiDeviceName = (String) ((JComboBox) evt.getSource()).getSelectedItem();
     }//GEN-LAST:event_midiOutComboBoxActionPerformed
 
     private void enabledCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enabledCBActionPerformed
-        settings.enabled = ((JCheckBox)evt.getSource()).isSelected();
+        settings.enabled = ((JCheckBox) evt.getSource()).isSelected();
+        if (settings.enabled) {
+            enableControls();
+        } else {
+            disableControls();
+        }
     }//GEN-LAST:event_enabledCBActionPerformed
 
+    private void outputTypeChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeChanged
+        if (evt.getActionCommand().equalsIgnoreCase("Moppy")) {
+            settings.type = OutputType.MOPPY;
+            midiOutLabel.setEnabled(false);
+            midiOutComboBox.setEnabled(false);
+            comComboBox.setEnabled(true);
+        } else {
+            settings.type = OutputType.MIDI;
+            comComboBox.setEnabled(false);
+            midiOutLabel.setEnabled(true);
+            midiOutComboBox.setEnabled(true);
+        }
+    }//GEN-LAST:event_outputTypeChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton MIDITypeRB;
     private javax.swing.JComboBox comComboBox;
