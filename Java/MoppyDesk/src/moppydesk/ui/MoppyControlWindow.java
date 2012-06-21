@@ -204,8 +204,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
 
     private void initializeReceivers() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
-        app.rm.close();
-        Arrays.fill(app.outputReceivers, null);
+        app.rm.clearReceivers();
         
         outputPlayers.clear();
         
@@ -217,14 +216,14 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                     if (!outputPlayers.containsKey(os.comPort)){
                         outputPlayers.put(os.comPort, new MoppyPlayerOutput(new MoppyCOMBridge(os.comPort)));
                     }
-                    app.outputReceivers[ch] = outputPlayers.get(os.comPort);
+                    app.rm.setReceiver(ch, outputPlayers.get(os.comPort));
                 } 
                 //MIDIPlayer/Receivers are grouped by MIDI output name
                 else if (os.type.equals(OutputSetting.OutputType.MIDI)) {
                     if (!outputPlayers.containsKey(os.midiDeviceName)){
                         outputPlayers.put(os.midiDeviceName, new MoppyMIDIOutput(os.midiDeviceName));
                     }
-                    app.outputReceivers[ch] = outputPlayers.get(os.midiDeviceName);
+                    app.rm.setReceiver(ch, outputPlayers.get(os.midiDeviceName));
                 }
             }
         }

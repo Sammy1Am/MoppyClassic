@@ -26,8 +26,7 @@ import org.jdesktop.application.SingleFrameApplication;
 public class MoppyUI extends SingleFrameApplication{
 
     public MoppySequencer ms = null;
-    public Receiver[] outputReceivers = new Receiver[16];
-    public ReceiverMarshaller rm = new ReceiverMarshaller(outputReceivers);
+    public ReceiverMarshaller rm = new ReceiverMarshaller();
     
     public Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
     
