@@ -7,17 +7,33 @@ package moppydesk;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sound.midi.MidiDevice;
+import javax.sound.midi.*;
 import javax.sound.midi.MidiDevice.Info;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 
 /**
  *
  * @author Sam
  */
-public class MoppyMIDIBridge {
+public class MoppyMIDIBridge implements Receiver{
     
+    MidiDevice device;
+    Receiver deviceReceiver;
+    
+    public MoppyMIDIBridge(String midiDeviceName) throws MidiUnavailableException{
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+        for (Info i : infos){
+            try {
+                if (i.getName().equalsIgnoreCase(midiDeviceName)){
+                    this.device = MidiSystem.getMidiDevice(i);
+                }
+            } catch (MidiUnavailableException ex) {
+                Logger.getLogger(MoppyMIDIBridge.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        device.open();
+        deviceReceiver = device.getReceiver();
+    }
     
     public static HashMap<String,Info> getMIDIOutInfos(){
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
@@ -34,5 +50,14 @@ public class MoppyMIDIBridge {
             }
         }
         return outInfos;
+    }
+
+    public void send(MidiMessage message, long timeStamp) {
+        deviceReceiver.send(message, timeStamp);
+    }
+
+    public void close() {
+        deviceReceiver.close();
+        device.close();
     }
 }
