@@ -42,7 +42,7 @@ public class MoppyMIDIBridge implements Receiver{
         for (Info i : infos){
             try {
                 MidiDevice dev = MidiSystem.getMidiDevice(i);
-                if (dev.getMaxTransmitters() != 0){
+                if (dev.getMaxReceivers() != 0){
                     outInfos.put(i.getName(), i);
                 }
             } catch (MidiUnavailableException ex) {
