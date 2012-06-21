@@ -144,15 +144,22 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
     }//GEN-LAST:event_jSlider1tempoSliderChanged
 
     private void startButtonClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonClicked
-        startButton.setEnabled(false);
-        seq.startSequencer();
+        if (startButton.getText().equals("Start")){
+            seq.startSequencer();
+            controlWindow.setStatus("Playing!");
+            startButton.setText("Pause");
+        } else {
+            seq.stopSequencer();
+            startButton.setText("Start");
+            controlWindow.setStatus("...Paused");
+        }
     }//GEN-LAST:event_startButtonClicked
 
     private void stopButtonstopResetClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonstopResetClicked
         controlWindow.setStatus("Stopping...");
         seq.stopSequencer();
-        startButton.setEnabled(true);
-        controlWindow.setStatus("Stopped");
+        seq.resetSequencer();
+        controlWindow.setStatus("Stopped and Reset.");
     }//GEN-LAST:event_stopButtonstopResetClicked
 
     private void loadButtonloadSequence(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonloadSequence
@@ -183,7 +190,7 @@ public class SequencerControls extends javax.swing.JPanel implements MoppyStatus
             controlWindow.setStatus("Loaded " + sequenceFile.getName());
             startButton.setEnabled(true);
         } catch (Exception ex) {
-            Logger.getLogger(MoppyMainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MoppyControlWindow.class.getName()).log(Level.SEVERE, null, ex);
             controlWindow.setStatus("File loading error!");
             JOptionPane.showMessageDialog(this.getRootPane(), ex);
         }
