@@ -45,9 +45,11 @@ public class MoppyPlayer implements Receiver {
 
     public MoppyPlayer(MoppyBridge newMb) {
         mb = newMb;
+        mb.resetDrives();
     }
 
     public void close() {
+        mb.resetDrives();
         mb.close();
     }
 

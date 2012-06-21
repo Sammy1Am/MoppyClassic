@@ -4,11 +4,17 @@
  */
 package moppydesk.ui;
 
-import java.awt.FlowLayout;
-import java.util.ArrayList;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import moppydesk.*;
 
 /**
@@ -17,11 +23,13 @@ import moppydesk.*;
  */
 public class MoppyControlWindow extends javax.swing.JFrame {
 
+    private static int MIDI_CHANNELS = 16;
     MoppyUI app;
+    HashMap<String, Info> availableMIDIOuts;
+    OutputSetting[] outputSettings = new OutputSetting[MIDI_CHANNELS];
     
-    HashMap<String,Info> availableMIDIOuts;
-    ArrayList<OutputSettings> outputSettings = new ArrayList<OutputSettings>();
-    
+    HashMap<String,Receiver> outputPlayers = new HashMap<String, Receiver>();
+
     /**
      * Creates new form MoppyControlWindow
      */
@@ -29,29 +37,28 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         this.app = app;
         availableMIDIOuts = MoppyMIDIBridge.getMIDIOutInfos();
         loadOutputSettings();
-        
+
         initComponents();
-        
+
         setupOutputControls();
     }
-    
-    private void loadOutputSettings(){
-        OutputSettings[] os = (OutputSettings[])app.getPreferenceObject(Constants.PREF_OUTPUT_SETTINGS);
-        if (os == null){
-            outputSettings.clear();
-            for (int i=1;i<=16;i++){
-                outputSettings.add(new OutputSettings(i));
+
+    private void loadOutputSettings() {
+        OutputSetting[] os = (OutputSetting[]) app.getPreferenceObject(Constants.PREF_OUTPUT_SETTINGS);
+        if (os == null) {
+            for (int i = 1; i <= 16; i++) {
+                outputSettings[i - 1] = new OutputSetting(i);
             }
-            app.putPreferenceObject(Constants.PREF_OUTPUT_SETTINGS, outputSettings.toArray(new OutputSettings[outputSettings.size()]));
+            app.putPreferenceObject(Constants.PREF_OUTPUT_SETTINGS, outputSettings);
         } else {
-            outputSettings = new ArrayList<OutputSettings>(Arrays.asList(os));
+            outputSettings = os;
         }
     }
-    
-    private void setupOutputControls(){
-        
-        
-        for (OutputSettings s : outputSettings){
+
+    private void setupOutputControls() {
+
+
+        for (OutputSetting s : outputSettings) {
             ChannelOutControl newControl = new ChannelOutControl(this, s);
             //TODO Read in preferences here?  Serialize all properties to preferences?
             mainOutputPanel.add(newControl);
@@ -108,23 +115,25 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             .addComponent(jSeparator1)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(mainStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addGap(10, 10, 10)
-                            .addComponent(mainInputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(mainOutputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(314, 314, 314)
-                        .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(inputSelectBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(493, 493, 493)
+                                .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(inputSelectBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(mainInputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(mainOutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(mainStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -150,21 +159,98 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void connect() {
+        try {
+            
+            //Disable and save output settings...
+            //TODO Disable output controls
+            app.putPreferenceObject(Constants.PREF_OUTPUT_SETTINGS, outputSettings);
+            app.savePreferences();
+            
+            setStatus("Initializing Receivers...");
+            initializeReceivers();
+            
+            enableInputDevice();
+            
+            setStatus("Connected.");
+        } catch (Exception ex) {
+            Logger.getLogger(MoppyControlWindow.class.getName()).log(Level.SEVERE, null, ex);
+            //TODO Show message
+            disconnect();
+        }
+    }
+
+    private void disconnect() {
+        disableInputDevice();
+        setStatus("Disconnecting...");
+        app.rm.close();
+        //Reenable output settings
+        //TODO Enable output controls
+        
+        setStatus("Disconnected.");
+    }
+
+    private void initializeReceivers() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
+        app.rm.close();
+        Arrays.fill(app.outputReceivers, null);
+        
+        outputPlayers.clear();
+        
+        for (int ch = 0; ch < 16; ch++) {
+            OutputSetting os = outputSettings[ch];
+            if (os.enabled) {
+                // MoppyPlayer/Receivers are grouped by COM port
+                if (os.type.equals(OutputSetting.OutputType.MOPPY)) {
+                    if (!outputPlayers.containsKey(os.comPort)){
+                        outputPlayers.put(os.comPort, new MoppyPlayer(new MoppyBridge(os.comPort)));
+                    }
+                    app.outputReceivers[ch] = outputPlayers.get(os.comPort);
+                } 
+                //MIDIPlayer/Receivers are grouped by MIDI output name
+                else if (os.type.equals(OutputSetting.OutputType.MIDI)) {
+                    if (!outputPlayers.containsKey(os.midiDeviceName)){
+                        outputPlayers.put(os.midiDeviceName, new MoppyMIDIBridge(os.midiDeviceName));
+                    }
+                    app.outputReceivers[ch] = outputPlayers.get(os.midiDeviceName);
+                }
+            }
+        }
+    }
+
+    private void enableInputDevice(){
+        inputSelectBox.setEnabled(false);
+        if (inputSelectBox.getSelectedIndex() == 0){ //MIDI File
+            MoppySequencer seq = app.initializeSequencer();
+            SequencerControls secC = new SequencerControls(app, this, seq);
+            seq.addListener(secC);
+            mainInputPanel.add(secC);
+        } else { //MIDI IN
+            
+        }
+    }
+    
+    private void disableInputDevice(){
+        app.ms.closeSequencer();
+        mainInputPanel.removeAll();
+        mainInputPanel.repaint();
+        inputSelectBox.setEnabled(true);
+    }
+    
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         connectButton.setEnabled(false);
-        if (connectButton.getText().equals("Connect")){
-            //TODO Run connect code
+        if (connectButton.getText().equals("Connect")) {
+            connect();
             connectButton.setText("Disconnect");
         } else {
-            //TODO Run disconnect code
+            disconnect();
             connectButton.setText("Connect");
         }
         connectButton.setEnabled(true);
     }//GEN-LAST:event_connectButtonActionPerformed
 
-    
-    public void setStatus(String newStatus){
+    public void setStatus(String newStatus) {
         mainStatusLabel.setText(newStatus);
+        mainStatusLabel.repaint();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton connectButton;

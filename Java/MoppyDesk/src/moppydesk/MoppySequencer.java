@@ -24,20 +24,15 @@ import javax.sound.midi.Sequencer;
  */
 public class MoppySequencer implements MetaEventListener{
 
-    MoppyBridge mb;
-    MoppyPlayer mp;
     Sequencer sequencer;
+    Sequence currentSequence = null;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
-    public MoppySequencer(String comPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
-        mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
-        mp = new MoppyPlayer(mb);
-
-        mb.resetDrives();
+    public MoppySequencer(Receiver newReceiver) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
-        sequencer.getTransmitter().setReceiver(mp); // Set MoppyPlayer as a receiver.
+        sequencer.getTransmitter().setReceiver(newReceiver); // Set MoppyPlayer as a receiver.
         sequencer.addMetaEventListener(this);
     }
 
@@ -48,6 +43,7 @@ public class MoppySequencer implements MetaEventListener{
         
         sequencer.setSequence(sequence);
         System.out.println("Loaded sequence with "+(sequence.getTracks().length-1)+" MIDI channels.");
+        currentSequence = sequence;
     }
     
     public void startSequencer(){
@@ -58,7 +54,13 @@ public class MoppySequencer implements MetaEventListener{
         if (sequencer.isOpen()){
                 sequencer.stop();
             }
-        mb.resetDrives();
+    }
+    
+    public void resetSequencer(){
+        if (sequencer.isOpen()){
+                sequencer.stop();
+                sequencer.setTickPosition(0);
+            }
     }
     
     public void setTempo(float newTempo){
@@ -76,7 +78,6 @@ public class MoppySequencer implements MetaEventListener{
     public void closeSequencer(){
         stopSequencer();
         sequencer.close();
-        mp.close();
     }
 
     public void meta(MetaMessage meta) {

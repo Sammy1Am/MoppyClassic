@@ -10,8 +10,11 @@ import gnu.io.UnsupportedCommOperationException;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
+import moppydesk.outputs.ReceiverMarshaller;
 import moppydesk.ui.MoppyControlWindow;
 import org.jdesktop.application.SingleFrameApplication;
 
@@ -22,6 +25,8 @@ import org.jdesktop.application.SingleFrameApplication;
 public class MoppyUI extends SingleFrameApplication{
 
     public MoppySequencer ms = null;
+    public Receiver[] outputReceivers = new Receiver[16];
+    public ReceiverMarshaller rm = new ReceiverMarshaller(outputReceivers);
     
     public Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
     
@@ -46,7 +51,7 @@ public class MoppyUI extends SingleFrameApplication{
                 ms = null;
             }
 
-            ms = new MoppySequencer(prefs.get(Constants.PREF_COM_PORT,null));
+            ms = new MoppySequencer(rm);
             
         } catch (NoSuchPortException ex) {
             Logger.getLogger(MoppyUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -70,6 +75,14 @@ public class MoppyUI extends SingleFrameApplication{
         }
     }
 
+    public void savePreferences(){
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(MoppyUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void putPreferenceObject(String key, Object object){
         try {
             prefs.putByteArray(key, serializePref(object));
@@ -82,7 +95,7 @@ public class MoppyUI extends SingleFrameApplication{
         try {
             return deserializePref(prefs.getByteArray(key, null));
         } catch (NullPointerException ex) {
-            Logger.getLogger(MoppyUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MoppyUI.class.getName()).log(Level.WARNING, "No preference set for "+key, ex);
         } catch (IOException ex) {
             Logger.getLogger(MoppyUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
