@@ -7,6 +7,8 @@ import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,4 +100,14 @@ public class MoppyBridge {
         }
     }
 
+    public static String[] getAvailableCOMPorts(){
+        ArrayList<String> portIdentifierStrings = new ArrayList<String>();
+        
+        Enumeration<CommPortIdentifier> comPorts = CommPortIdentifier.getPortIdentifiers();
+        while (comPorts.hasMoreElements()) {
+            portIdentifierStrings.add(comPorts.nextElement().getName());
+        }
+        
+        return portIdentifierStrings.toArray(new String[portIdentifierStrings.size()]);
+    }
 }
