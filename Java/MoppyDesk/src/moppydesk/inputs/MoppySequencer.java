@@ -5,40 +5,38 @@ import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Transmitter;
 import moppydesk.MoppyStatusConsumer;
 
 /**
  *
  * @author Sammy1Am
  */
-public class MoppySequencer implements MetaEventListener{
+public class MoppySequencer implements MetaEventListener, Transmitter{
 
     Sequencer sequencer;
     Sequence currentSequence = null;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
-    public MoppySequencer(Receiver newReceiver) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
+    public MoppySequencer() throws MidiUnavailableException {
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
-        sequencer.getTransmitter().setReceiver(newReceiver); // Set MoppyPlayer as a receiver.
         sequencer.addMetaEventListener(this);
     }
 
     public void loadFile(String filePath) throws InvalidMidiDataException, IOException, MidiUnavailableException {
-
         sequencer.stop();
         Sequence sequence = MidiSystem.getSequence(new File(filePath));
         
@@ -111,5 +109,26 @@ public class MoppySequencer implements MetaEventListener{
             
             System.out.println("Tempo changed to: " + newTempo);
         }
+    }
+
+    public void setReceiver(Receiver receiver) {
+        try {
+            sequencer.getTransmitter().setReceiver(receiver);
+        } catch (MidiUnavailableException ex) {
+            Logger.getLogger(MoppySequencer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Receiver getReceiver() {
+        try {
+            return sequencer.getReceiver();
+        } catch (MidiUnavailableException ex) {
+            Logger.getLogger(MoppySequencer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public void close() {
+        closeSequencer();
     }
 }

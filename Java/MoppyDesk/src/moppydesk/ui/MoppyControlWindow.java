@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import moppydesk.*;
 
 /**
@@ -28,23 +30,31 @@ import moppydesk.*;
  */
 public class MoppyControlWindow extends javax.swing.JFrame {
 
-    private static int MIDI_CHANNELS = 16;
     MoppyUI app;
     HashMap<String, Info> availableMIDIOuts;
-    OutputSetting[] outputSettings = new OutputSetting[MIDI_CHANNELS];
+    OutputSetting[] outputSettings = new OutputSetting[Constants.NUM_MIDI_CHANNELS];
     
     HashMap<String,Receiver> outputPlayers = new HashMap<String, Receiver>();
+    
+    MIDIInControls midiInControls;
+    SequencerControls seqControls;
 
     /**
      * Creates new form MoppyControlWindow
      */
     public MoppyControlWindow(MoppyUI app) {
         this.app = app;
+        
+        midiInControls = new MIDIInControls(app.midiIn);
+        seqControls = new SequencerControls(app, this, app.ms);
+        app.ms.addListener(seqControls);
+        
         availableMIDIOuts = MoppyMIDIOutput.getMIDIOutInfos();
         loadOutputSettings();
 
         initComponents();
 
+        updateInputPanel();
         setupOutputControls();
     }
 
@@ -98,6 +108,11 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         mainInputPanel.setPreferredSize(new java.awt.Dimension(350, 400));
 
         inputSelectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MIDI File", "MIDI IN Port" }));
+        inputSelectBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputSelectBoxActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Input Mode");
 
@@ -179,20 +194,28 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             setStatus("Initializing Receivers...");
             initializeReceivers();
             
-            enableInputDevice();
+            inputSelectBox.setEnabled(false);
+            if(inputSelectBox.getSelectedIndex() == 0){//Sequencer
+                app.ms.setReceiver(app.rm);
+            } else if (inputSelectBox.getSelectedIndex() == 1){//MIDI In
+                app.midiIn.setReceiver(app.rm);
+            }
             
+            connectButton.setText("Disconnect");
             setStatus("Connected.");
         } catch (Exception ex) {
             Logger.getLogger(MoppyControlWindow.class.getName()).log(Level.SEVERE, null, ex);
-            //TODO Show message
+            JOptionPane.showMessageDialog(rootPane, ex.toString(),ex.getMessage(),JOptionPane.ERROR_MESSAGE);
             disconnect();
         }
     }
 
     private void disconnect() {
-        disableInputDevice();
         setStatus("Disconnecting...");
+        app.ms.stopSequencer();
+        app.midiIn.close();
         app.rm.close();
+        //TODO Clean up ^ that.  Maybe some sort of interface to stop/disconnect them the same way.
         //Reenable output settings
         for (Component c : mainOutputPanel.getComponents()){
                 if (c instanceof ChannelOutControl){
@@ -200,6 +223,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                 }
             }
         
+        inputSelectBox.setEnabled(true);
+        connectButton.setText("Connect");
         setStatus("Disconnected.");
     }
 
@@ -208,8 +233,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         
         outputPlayers.clear();
         
-        for (int ch = 0; ch < 16; ch++) {
-            OutputSetting os = outputSettings[ch];
+        for (int ch = 1; ch <= 16; ch++) {
+            OutputSetting os = outputSettings[ch-1]; //OutputSettings are 0-indexed
             if (os.enabled) {
                 // MoppyPlayer/Receivers are grouped by COM port
                 if (os.type.equals(OutputSetting.OutputType.MOPPY)) {
@@ -229,38 +254,29 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         }
     }
 
-    private void enableInputDevice(){
-        inputSelectBox.setEnabled(false);
-        if (inputSelectBox.getSelectedIndex() == 0){ //MIDI File
-            MoppySequencer seq = app.initializeSequencer();
-            SequencerControls secC = new SequencerControls(app, this, seq);
-            seq.addListener(secC);
-            mainInputPanel.add(secC);
-        } else { //MIDI IN
-            
-        }
-    }
-    
-    private void disableInputDevice(){
-        if (app.ms!=null){
-            app.ms.closeSequencer();
-        }
+    private void updateInputPanel(){
         mainInputPanel.removeAll();
+        if (inputSelectBox.getSelectedIndex() == 0){ //MIDI File
+            mainInputPanel.add(seqControls);
+        } else { //MIDI IN
+            mainInputPanel.add(midiInControls);
+        }
         mainInputPanel.repaint();
-        inputSelectBox.setEnabled(true);
     }
     
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         connectButton.setEnabled(false);
         if (connectButton.getText().equals("Connect")) {
             connect();
-            connectButton.setText("Disconnect");
         } else {
             disconnect();
-            connectButton.setText("Connect");
         }
         connectButton.setEnabled(true);
     }//GEN-LAST:event_connectButtonActionPerformed
+
+    private void inputSelectBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputSelectBoxActionPerformed
+        updateInputPanel();
+    }//GEN-LAST:event_inputSelectBoxActionPerformed
 
     public void setStatus(String newStatus) {
         mainStatusLabel.setText(newStatus);

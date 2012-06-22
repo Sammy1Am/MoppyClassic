@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk.outputs;
 
 import java.util.Arrays;
@@ -47,6 +43,7 @@ public class ReceiverMarshaller implements Receiver{
         if (outputReceivers[MIDIChannel-1] != null){
             outputReceivers[MIDIChannel-1].close();
         }
+        outputReceivers[MIDIChannel-1] = channelReceiver;
     }
     
     /**
