@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Transmitter;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.DefaultComboBoxModel;
@@ -15,7 +16,7 @@ import javax.swing.DefaultComboBoxModel;
  * Controls for the {@link MoppyMIDIInput} object.
  * @author Sam
  */
-public class MIDIInControls extends javax.swing.JPanel {
+public class MIDIInControls extends InputPanel {
 
     MoppyMIDIInput midiInput;
     HashMap<String,Info> availableMIDIIns = MoppyMIDIInput.getMIDIInInfos();
@@ -83,4 +84,16 @@ public class MIDIInControls extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JComboBox midiInComboBox;
     // End of variables declaration//GEN-END:variables
+
+    public Transmitter getTransmitter() {
+        return midiInput;
+    }
+
+    public void connected() {
+        //Nothing to do;
+    }
+
+    public void disconnected() {
+        midiInput.setReceiver(null); // Clear out receiver so that MIDI messages aren't sent anywhere.
+    }
 }

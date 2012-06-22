@@ -38,6 +38,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     
     MIDIInControls midiInControls;
     SequencerControls seqControls;
+    
+    InputPanel currentInputPanel;
 
     /**
      * Creates new form MoppyControlWindow
@@ -195,11 +197,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             initializeReceivers();
             
             inputSelectBox.setEnabled(false);
-            if(inputSelectBox.getSelectedIndex() == 0){//Sequencer
-                app.ms.setReceiver(app.rm);
-            } else if (inputSelectBox.getSelectedIndex() == 1){//MIDI In
-                app.midiIn.setReceiver(app.rm);
-            }
+            currentInputPanel.getTransmitter().setReceiver(app.rm);
+            currentInputPanel.connected();
             
             connectButton.setText("Disconnect");
             setStatus("Connected.");
@@ -212,10 +211,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
 
     private void disconnect() {
         setStatus("Disconnecting...");
-        app.ms.stopSequencer();
-        app.midiIn.close();
+        currentInputPanel.disconnected();
         app.rm.close();
-        //TODO Clean up ^ that.  Maybe some sort of interface to stop/disconnect them the same way.
+        
         //Reenable output settings
         for (Component c : mainOutputPanel.getComponents()){
                 if (c instanceof ChannelOutControl){
@@ -257,11 +255,12 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     private void updateInputPanel(){
         mainInputPanel.removeAll();
         if (inputSelectBox.getSelectedIndex() == 0){ //MIDI File
-            mainInputPanel.add(seqControls);
+            currentInputPanel = seqControls;
         } else { //MIDI IN
-            mainInputPanel.add(midiInControls);
+            currentInputPanel = midiInControls;
         }
-        mainInputPanel.repaint();
+        mainInputPanel.add(currentInputPanel);
+        mainInputPanel.revalidate();
     }
     
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
