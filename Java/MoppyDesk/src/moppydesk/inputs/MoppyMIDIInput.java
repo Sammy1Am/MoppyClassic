@@ -16,6 +16,7 @@ public class MoppyMIDIInput implements Transmitter, Receiver{
             currentDevice.close();
         }
         currentDevice = MidiSystem.getMidiDevice(deviceInfo);
+        currentDevice.open();
         currentDevice.getTransmitter().setReceiver(this);
     }
     
@@ -44,7 +45,9 @@ public class MoppyMIDIInput implements Transmitter, Receiver{
     
     public void send(MidiMessage message, long timeStamp) {
         //TODO Edit message based on settings.
-        downstreamReceiver.send(message, timeStamp);
+        if (downstreamReceiver != null){
+            downstreamReceiver.send(message, timeStamp);
+        }
     }
     
     
