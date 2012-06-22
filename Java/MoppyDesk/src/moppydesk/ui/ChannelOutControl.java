@@ -44,11 +44,11 @@ public class ChannelOutControl extends javax.swing.JPanel {
 
 
         if (settings.type.equals(OutputType.MOPPY)) {
-            //outputTypeRB.setSelected(moppyTypeRB.getModel(), true);
-            moppyTypeRB.doClick();
+            moppyTypeRB.setSelected(true);
+            outputTypeChanged(OutputType.MOPPY);
         } else {
-            //outputTypeRB.setSelected(MIDITypeRB.getModel(), true);
-            MIDITypeRB.doClick();
+            MIDITypeRB.setSelected(true);
+            outputTypeChanged(OutputType.MIDI);
         }
 
         comComboBox.setSelectedItem(settings.comPort);
@@ -103,7 +103,6 @@ public class ChannelOutControl extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(525, 23));
 
         outputTypeRB.add(moppyTypeRB);
-        moppyTypeRB.setSelected(true);
         moppyTypeRB.setText("Moppy");
         moppyTypeRB.setToolTipText("Sends Moppy-protocol serial data to selected COM port");
         moppyTypeRB.addActionListener(new java.awt.event.ActionListener() {
@@ -121,7 +120,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
             }
         });
 
-        comComboBox.setModel(new DefaultComboBoxModel(MoppyCOMBridge.getAvailableCOMPorts()));
+        comComboBox.setModel(new DefaultComboBoxModel(moppydesk.outputs.MoppyCOMBridge.getAvailableCOMPorts()));
         comComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comComboBoxActionPerformed(evt);
@@ -196,17 +195,24 @@ public class ChannelOutControl extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_enabledCBActionPerformed
 
-    private void outputTypeChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeChanged
-        if (evt.getActionCommand().equalsIgnoreCase("Moppy")) {
-            settings.type = OutputType.MOPPY;
+    private void outputTypeChanged(OutputType newType){
+        settings.type = newType;
+        if (newType.equals(OutputType.MOPPY)){
             midiOutLabel.setEnabled(false);
             midiOutComboBox.setEnabled(false);
             comComboBox.setEnabled(true);
         } else {
-            settings.type = OutputType.MIDI;
             comComboBox.setEnabled(false);
             midiOutLabel.setEnabled(true);
             midiOutComboBox.setEnabled(true);
+        }
+    }
+    
+    private void outputTypeChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeChanged
+        if (evt.getActionCommand().equalsIgnoreCase("Moppy")) {
+            outputTypeChanged(OutputType.MOPPY);
+        } else {
+            outputTypeChanged(OutputType.MIDI);
         }
     }//GEN-LAST:event_outputTypeChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables

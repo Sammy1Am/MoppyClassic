@@ -64,7 +64,6 @@
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="outputTypeRB"/>
         </Property>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Moppy"/>
         <Property name="toolTipText" type="java.lang.String" value="Sends Moppy-protocol serial data to selected COM port"/>
       </Properties>
@@ -87,7 +86,7 @@
     <Component class="javax.swing.JComboBox" name="comComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new DefaultComboBoxModel(moppydesk.MoppyCOMBridge.getAvailableCOMPorts())" type="code"/>
+          <Connection code="new DefaultComboBoxModel(moppydesk.outputs.MoppyCOMBridge.getAvailableCOMPorts())" type="code"/>
         </Property>
       </Properties>
       <Events>
