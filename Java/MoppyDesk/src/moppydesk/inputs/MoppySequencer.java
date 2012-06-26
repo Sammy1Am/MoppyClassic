@@ -49,6 +49,10 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
         sequencer.start();
     }
     
+    public boolean isRunning(){
+        return sequencer.isRunning();
+    }
+    
     public void stopSequencer(){
         if (sequencer.isOpen()){
                 sequencer.stop();

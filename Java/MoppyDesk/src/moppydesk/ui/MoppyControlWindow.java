@@ -13,16 +13,14 @@ import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import java.awt.Component;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import moppydesk.*;
+import moppydesk.outputs.MoppyReceiver;
 
 /**
  *
@@ -34,7 +32,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     HashMap<String, Info> availableMIDIOuts;
     OutputSetting[] outputSettings = new OutputSetting[Constants.NUM_MIDI_CHANNELS];
     
-    HashMap<String,Receiver> outputPlayers = new HashMap<String, Receiver>();
+    HashMap<String,MoppyReceiver> outputPlayers = new HashMap<String, MoppyReceiver>();
     
     MIDIInControls midiInControls;
     SequencerControls seqControls;

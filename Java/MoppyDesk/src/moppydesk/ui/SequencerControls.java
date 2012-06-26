@@ -22,18 +22,16 @@ import moppydesk.*;
  *
  * @author Sam
  */
-public class SequencerControls extends InputPanel implements MoppyStatusConsumer{
+public class SequencerControls extends InputPanel implements MoppyStatusConsumer {
 
     MoppySequencer seq;
     MoppyControlWindow controlWindow;
     MoppyUI app;
     final JFileChooser sequenceChooser = new JFileChooser();
-    
     Timer progressTimer;
-    
     private boolean isConnected = false;
     private boolean fileLoaded = false;
-    
+
     /**
      * Creates new form SequencerControls
      */
@@ -41,17 +39,18 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         this.seq = newSequencer;
         this.app = app;
         this.controlWindow = mcw;
-        
+
         initComponents();
-        
-        progressTimer = new Timer(1000, new ActionListener(){
+
+        progressTimer = new Timer(1000, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 updateProgressDisplay();
             }
         });
     }
-    
-    private void updateProgressDisplay() {   
+
+    private void updateProgressDisplay() {
         long currentSeconds = seq.getSecondsPosition();
         sequenceProgressSlider.setValue((int) (currentSeconds));
         String currentPosition = String.format("%d:%02d",
@@ -206,34 +205,39 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     }//GEN-LAST:event_jSlider1tempoSliderChanged
 
     private void startButtonClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonClicked
-        if (startButton.getText().equals("Start")){
+        if (startButton.getText().equals("Start")) {
             playSequencer();
         } else {
             pauseSequencer();
         }
     }//GEN-LAST:event_startButtonClicked
 
-    private void playSequencer(){
-            seq.startSequencer();
-            seq.setTempo(jSlider1.getValue());
-            controlWindow.setStatus("Playing!");
-            startButton.setText("Pause");
+    private void playSequencer() {
+        seq.startSequencer();
+        seq.setTempo(jSlider1.getValue());
+        controlWindow.setStatus("Playing!");
+        startButton.setText("Pause");
     }
-    
-    private void pauseSequencer(){
-            seq.stopSequencer();
-            startButton.setText("Start");
-            controlWindow.setStatus("...Paused");
-    }
-    
-    private void stopResetSequencer(){
-        controlWindow.setStatus("Stopping...");
+
+    private void pauseSequencer() {
         seq.stopSequencer();
-        seq.resetSequencer();
         startButton.setText("Start");
-        controlWindow.setStatus("Stopped and Reset.");
+        controlWindow.setStatus("...Paused");
     }
-    
+
+    private void stopResetSequencer() {
+        if (seq.isRunning()) {
+            controlWindow.setStatus("Stopping...");
+            seq.stopSequencer();
+            seq.resetSequencer();
+            startButton.setText("Start");
+            controlWindow.setStatus("Stopped.");
+        } else {
+            app.rm.reset();
+            controlWindow.setStatus("Reset.");
+        }
+    }
+
     private void stopButtonstopResetClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonstopResetClicked
         stopResetSequencer();
     }//GEN-LAST:event_stopButtonstopResetClicked
@@ -253,29 +257,29 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     }//GEN-LAST:event_loadButtonloadSequence
 
     private void sequenceProgressDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sequenceProgressDragged
-        int seconds = ((JSlider)evt.getSource()).getValue();
+        int seconds = ((JSlider) evt.getSource()).getValue();
         seq.setSecondsPosition(seconds);
-        currentPositionLabel.setText(String.format("%d:%02d", 
-                        TimeUnit.SECONDS.toMinutes(seconds),
-                        seconds%60));
+        currentPositionLabel.setText(String.format("%d:%02d",
+                TimeUnit.SECONDS.toMinutes(seconds),
+                seconds % 60));
     }//GEN-LAST:event_sequenceProgressDragged
 
     public void tempoChanged(int newTempo) {
         jSlider1.setValue(newTempo);
         bpmLabel.setText(newTempo + " bpm");
     }
-    
-        private void loadSequenceFile(File sequenceFile) {
+
+    private void loadSequenceFile(File sequenceFile) {
         try {
             controlWindow.setStatus("Loading file...");
             seq.loadFile(sequenceFile.getPath());
             sequenceNameLabel.setText(sequenceFile.getName());
-            sequenceProgressSlider.setMaximum((int)(seq.getSecondsLength()));
+            sequenceProgressSlider.setMaximum((int) (seq.getSecondsLength()));
             app.prefs.put(Constants.PREF_LOADED_SEQ, sequenceFile.getPath());
             fileLoaded = true;
             controlWindow.setStatus("Loaded " + sequenceFile.getName());
             updateProgressDisplay();
-            if (isConnected){
+            if (isConnected) {
                 startButton.setEnabled(true);
             }
         } catch (Exception ex) {
@@ -284,7 +288,6 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
             JOptionPane.showMessageDialog(this.getRootPane(), ex);
         }
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bpmLabel;
     private javax.swing.JLabel currentPositionLabel;
@@ -305,7 +308,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     public void connected() {
         progressTimer.start();
         isConnected = true;
-        if (fileLoaded){
+        if (fileLoaded) {
             startButton.setEnabled(true);
         }
     }

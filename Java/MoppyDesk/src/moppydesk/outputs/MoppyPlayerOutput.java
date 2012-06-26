@@ -8,7 +8,7 @@ import javax.sound.midi.Receiver;
  *
  * @author Sammy1Am
  */
-public class MoppyPlayerOutput implements Receiver {
+public class MoppyPlayerOutput implements MoppyReceiver {
 
     /**
      * The periods for each MIDI note in an array.  The floppy drives
@@ -103,5 +103,9 @@ public class MoppyPlayerOutput implements Receiver {
             }
         }
 
+    }
+
+    public void reset() {
+        mb.resetDrives();
     }
 }

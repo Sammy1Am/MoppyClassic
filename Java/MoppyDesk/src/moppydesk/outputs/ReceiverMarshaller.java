@@ -1,5 +1,6 @@
 package moppydesk.outputs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
@@ -12,14 +13,14 @@ import javax.sound.midi.ShortMessage;
  * message is routed to the appropriate receiver based on its channel.  If a receiver
  * is not defined for the given channel's index in the array, the message is dropped.
  */
-public class ReceiverMarshaller implements Receiver{
+public class ReceiverMarshaller implements MoppyReceiver{
 
     /**
-     * Array of {@link Receiver} references, one for each channel.  The same receiver
+     * Array of {@link MoppyReceiver} references, one for each channel.  The same receiver
      * object can be assigned to multiple indexes if it is going to be handling multiple
      * channels of data.
      */
-    private final Receiver[] outputReceivers = new Receiver[16];
+    private final MoppyReceiver[] outputReceivers = new MoppyReceiver[16];
     
     /**
      * Creates a new ReceiverMarshaller with an empty array of {@link Receiver}s.
@@ -36,7 +37,7 @@ public class ReceiverMarshaller implements Receiver{
      * @param MIDIChannel
      * @param channelReceiver 
      */
-    public void setReceiver(int MIDIChannel, Receiver channelReceiver){
+    public void setReceiver(int MIDIChannel, MoppyReceiver channelReceiver){
         if (MIDIChannel < 1 || MIDIChannel > 16){
             throw new IllegalArgumentException("Only channels 1-16 are supported by the ReceiverMarshaller!");
         }
@@ -74,5 +75,21 @@ public class ReceiverMarshaller implements Receiver{
             }
         }
         Arrays.fill(outputReceivers, null);
+    }
+
+    /**
+     * Finds the unique set of receivers and calls the {@link MoppyReceiver#reset() } method.
+     * We go through the trouble of finding uniques incase the reset is time-consuming.
+     */
+    public void reset() {
+        ArrayList<MoppyReceiver> uniqueReceivers = new ArrayList<MoppyReceiver>();
+        for (MoppyReceiver r: outputReceivers){
+            if (r!= null && !uniqueReceivers.contains(r)){
+                uniqueReceivers.add(r);
+            }
+        }
+        for (MoppyReceiver r : uniqueReceivers){
+            r.reset();
+        }
     }
 }

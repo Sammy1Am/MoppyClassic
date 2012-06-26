@@ -14,7 +14,7 @@ import javax.sound.midi.MidiDevice.Info;
  *
  * @author Sam
  */
-public class MoppyMIDIOutput implements Receiver{
+public class MoppyMIDIOutput implements MoppyReceiver{
     
     MidiDevice device;
     Receiver deviceReceiver;
@@ -59,5 +59,18 @@ public class MoppyMIDIOutput implements Receiver{
     public void close() {
         deviceReceiver.close();
         device.close();
+    }
+
+    public void reset() {
+        //Nothing really to do here, I don't think.
+        if (deviceReceiver != null){
+            try {
+                ShortMessage resetMessage = new ShortMessage();
+                resetMessage.setMessage(ShortMessage.SYSTEM_RESET);
+                deviceReceiver.send(resetMessage,(long)-1);
+            } catch (InvalidMidiDataException ex) {
+                Logger.getLogger(MoppyMIDIOutput.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
