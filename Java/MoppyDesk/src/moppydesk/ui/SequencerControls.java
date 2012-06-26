@@ -215,6 +215,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     private void playSequencer(){
             seq.startSequencer();
+            seq.setTempo(jSlider1.getValue());
             controlWindow.setStatus("Playing!");
             startButton.setText("Pause");
     }
