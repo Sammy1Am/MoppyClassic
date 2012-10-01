@@ -8,6 +8,13 @@ by Sammy1Am
 
 Moppy is a M_usical Fl_oppy controller program built for the Ardiuno UNO.
 
+
+-- NEW VERSION --
+Check out MoppyAdvanced at :
+https://github.com/SammyIAm/Moppy/tree/moppy-advanced
+Lots of new features, and a few stability fixes.
+
+
 --INSTALLATION--
 The Arduino code requires the TimeOne library available here: http://www.arduino.cc/playground/Code/Timer1
 
