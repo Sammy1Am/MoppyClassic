@@ -6,7 +6,7 @@
 
 by Sammy1Am
 
-Moppy is a M_usical Fl_oppy controller program built for the Ardiuno UNO.
+Moppy is a M_usical Fl_oppy controller program built for the Arduino UNO.
 
 
 -- NEW VERSION --
