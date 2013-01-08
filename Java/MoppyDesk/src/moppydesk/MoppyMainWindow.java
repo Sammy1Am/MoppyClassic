@@ -17,6 +17,8 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiSystem;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -29,8 +31,10 @@ import javax.swing.JSlider;
 public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusConsumer {
 
     static String PREF_COM_PORT = "comPort";
+    static String PREF_MIDI_PORT = "midiPort";
     static String PREF_LOADED_SEQ = "loadedSequencePath";
     MoppyUI app;
+    int midiPort;
     Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
     final JFileChooser sequenceChooser = new JFileChooser();
     boolean comboBoxReady = false;
@@ -41,6 +45,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         initComponents();
 
         updateComSelectionMenu();
+        updateMidiSelectionMenu();
 
         statusLabel.setText("Ready");
 
@@ -59,14 +64,23 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         comSelectionMenu.setSelectedItem(prefs.get(PREF_COM_PORT, ""));
         comboBoxReady = true;
     }
+    
+    private void updateMidiSelectionMenu() {
+        midiSelectionMenu.removeAllItems();
+        Info[] e = MidiSystem.getMidiDeviceInfo();
+        for (Info device : e)
+        {
+            midiSelectionMenu.addItem(device.getName());
+        }
+    }
 
-    private void initializeSequencer(String comPort) {
+    private void initializeSequencer(String comPort, int midiPort) {
         statusLabel.setText("Initializing sequencer...");
         if (app.ms != null) {
             app.ms.closeSequencer();
         }
         try {
-            app.ms = new MoppySequencer(comPort);
+            app.ms = new MoppySequencer(comPort, midiPort);
             app.ms.addListener(this);
         } catch (Exception ex) {
             Logger.getLogger(MoppyMainWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -122,6 +136,8 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        midiSelectionMenu = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MoppyDesk");
@@ -326,6 +342,16 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         jLabel3.setText("Arduino Port:");
         jLabel3.setName("jLabel3"); // NOI18N
 
+        jLabel4.setText("MIDI Device");
+        jLabel4.setName("jLabel4");
+
+        midiSelectionMenu.setName("midiSelectionMenu");
+        midiSelectionMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                midiSelectionMenuActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -334,12 +360,19 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTabbedPane1)
-                    .addComponent(statusLabel)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(statusLabel)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(58, 58, 58)
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(midiSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -348,7 +381,9 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(midiSelectionMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jTabbedPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -419,6 +454,12 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
         }
     }//GEN-LAST:event_comPortSelected
 
+    private void midiSelectionMenuActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+          JComboBox cb = (JComboBox) evt.getSource();
+          midiPort =  (int) cb.getSelectedIndex();
+          shutdownSequencer();
+    }                                                 
+
     private void windowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_windowClosing
         if (app.ms != null){
             app.ms.closeSequencer();
@@ -427,7 +468,7 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
 
     private void connectSequencerPressed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectSequencerPressed
         if (connectSeqButton.getText().equals("Connect")) {
-            initializeSequencer((String) comSelectionMenu.getSelectedItem());
+            initializeSequencer((String) comSelectionMenu.getSelectedItem(), midiPort);
         } else {
             shutdownSequencer();
         }
@@ -450,10 +491,12 @@ public class MoppyMainWindow extends javax.swing.JFrame implements MoppyStatusCo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel bpmLabel;
     private javax.swing.JComboBox comSelectionMenu;
+    private javax.swing.JComboBox midiSelectionMenu;
     private javax.swing.JButton connectSeqButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;

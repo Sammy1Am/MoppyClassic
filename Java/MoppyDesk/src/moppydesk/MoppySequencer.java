@@ -8,15 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MetaEventListener;
-import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+import javax.sound.midi.*;
 
 /**
  *
@@ -27,13 +19,26 @@ public class MoppySequencer implements MetaEventListener{
     MoppyBridge mb;
     MoppyPlayer mp;
     Sequencer sequencer;
+    Transmitter midiIn;
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
-    public MoppySequencer(String comPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
+    public MoppySequencer(String comPort, int midiPort) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
         mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
         mp = new MoppyPlayer(mb);
 
         mb.resetDrives();
+
+        MidiDevice device;
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+        try {
+            device = MidiSystem.getMidiDevice(infos[midiPort]);
+            System.out.println ("MIDI port selected: "+ midiPort);
+            device.open();
+            midiIn = device.getTransmitter();
+            midiIn.setReceiver(mp);
+        } catch (MidiUnavailableException e) {
+            System.out.println ("MIDI port error: "+ midiPort);
+        }
 
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
