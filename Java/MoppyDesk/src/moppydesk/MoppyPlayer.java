@@ -40,31 +40,59 @@ public class MoppyPlayer implements Receiver {
      */
     private int[] currentPeriod = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     
+    /**
+     * Mapping from MIDI channel to Arduino pin (zero is unassigned)
+     */
+    private int[] pinMapping = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    private int pinIndex;
+    
     MoppyBridge mb;
     SerialPort com;
 
     public MoppyPlayer(MoppyBridge newMb) {
         mb = newMb;
+        reset();
     }
 
     public void close() {
         mb.close();
     }
+    
+    public void reset() {
+        mb.resetDrives();
+        
+        // Cause pins to need to be remapped.
+        for (int i=0; i<pinMapping.length; i++) {
+            pinMapping[i] = 0;
+        }
+        pinIndex = 0;
+    }
 
+    private int pinMapping(int channel) {
+        // New channel we haven't seen yet. Assign pin sequentially.
+        if (pinMapping[channel] == 0) {
+            pinIndex += 1;
+            // Each channel occupies two pins, so multiply by two
+            pinMapping[channel] = pinIndex * 2;
+            System.out.println("Mapped channel " + channel + " to pin " + pinMapping[channel]);
+        }
+        
+        // Return Arduino pin for channel number.
+        return pinMapping[channel];
+    }
+    
     //Is called by Java MIDI libraries for each MIDI message encountered.
     public void send(MidiMessage message, long timeStamp) {
         if (message.getStatus() > 127 && message.getStatus() < 144) { // Note OFF
-            //Convert the MIDI channel being used to the controller pin on the
-            //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 127));
+            int channel = message.getStatus() - 127;
+            byte pin = (byte) pinMapping(channel);
 
             //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
             mb.sendEvent(pin, 0);
             currentPeriod[message.getStatus() - 128] = 0;
         } else if (message.getStatus() > 143 && message.getStatus() < 160) { // Note ON
-            //Convert the MIDI channel being used to the controller pin on the
-            //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 143));
+            int channel = message.getStatus() - 143;
+            byte pin = (byte) pinMapping(channel);
 
             //Get note number from MIDI message, and look up the period.
             //NOTE: Java bytes range from -128 to 127, but we need to make them
@@ -92,7 +120,8 @@ public class MoppyPlayer implements Receiver {
             if (currentPeriod[message.getStatus() - 224] != 0) {
                 //Convert the MIDI channel being used to the controller pin on the
                 //Arduino by multipying by 2.
-                byte pin = (byte) (2 * (message.getStatus() - 223));
+                int channel = message.getStatus() - 223;
+                byte pin = (byte) pinMapping(channel);
 
                 double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
 

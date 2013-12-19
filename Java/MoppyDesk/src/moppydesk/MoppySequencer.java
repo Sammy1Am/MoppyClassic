@@ -33,8 +33,6 @@ public class MoppySequencer implements MetaEventListener{
         mb = new MoppyBridge(comPort); //Create MoppyBridge on the COM port with the Arduino
         mp = new MoppyPlayer(mb);
 
-        mb.resetDrives();
-
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
         sequencer.getTransmitter().setReceiver(mp); // Set MoppyPlayer as a receiver.
@@ -42,8 +40,9 @@ public class MoppySequencer implements MetaEventListener{
     }
 
     public void loadFile(String filePath) throws InvalidMidiDataException, IOException, MidiUnavailableException {
-
         sequencer.stop();
+        mp.reset();
+        
         Sequence sequence = MidiSystem.getSequence(new File(filePath));
         
         sequencer.setSequence(sequence);
@@ -56,9 +55,9 @@ public class MoppySequencer implements MetaEventListener{
     
     public void stopSequencer(){
         if (sequencer.isOpen()){
-                sequencer.stop();
-            }
-        mb.resetDrives();
+            sequencer.stop();
+        }
+        mp.reset();
     }
     
     public void setTempo(float newTempo){
