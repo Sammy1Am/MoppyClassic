@@ -1,4 +1,4 @@
-package moppydesk;
+package moppydesk.arduino;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;

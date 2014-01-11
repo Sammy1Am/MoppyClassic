@@ -1,5 +1,6 @@
-package moppydesk;
+package moppydesk.arduino;
 
+import moppydesk.arduino.MoppyBridge;
 import gnu.io.SerialPort;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
@@ -41,7 +42,6 @@ public class MoppyPlayer implements Receiver {
     private int[] currentPeriod = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     
     MoppyBridge mb;
-    SerialPort com;
 
     public MoppyPlayer(MoppyBridge newMb) {
         mb = newMb;
