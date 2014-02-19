@@ -1,14 +1,15 @@
 <pre>
-      __  ___                   
-     /  |/  /__  ___  ___  __ __
-    / /|_/ / _ \/ _ \/ _ \/ // /
-   /_/  /_/\___/ .__/ .__/\_, / 
-              /_/  /_/   /___/  
-              </pre>
+ __  __                         
+|  \/  | ___  _ __  _ __  _   _ 
+| |\/| |/ _ \| '_ \| '_ \| | | |
+| |  | | (_) | |_) | |_) | |_| |
+|_|  |_|\___/| .__/| .__/ \__, |
+             |_|   |_|    |___/ 
+</pre>
 
 by Sammy1Am
 
-Moppy is a M_usical Fl_oppy controller program built for the Arduino UNO.
+Moppy is a **M**usical Fl **oppy** controller program built for the [Arduino Uno](http://arduino.cc/en/Main/ArduinoBoardUno).
 
 
 New version
@@ -26,11 +27,11 @@ The Arduino code requires the TimeOne library available here: http://www.arduino
 You will need to follow the directions in the appropriate Java/SerialDrivers folder for your system to install the serial drivers prior to running Moppy.
 
 
-Upload the included Arduino code to the Arduino of your choice, and open up the included Java code in your favorite IDE.  This code includes a NetBeans project for your convenience, so you should be able to open the project directly in NetBeans.
+Upload the included Arduino code to the Arduino of your choice (requires [Arduino IDE](http://arduino.cc/en/Main/Software)), and open up the included Java code in your favorite IDE.  This code includes a NetBeans project for your convenience, so you should be able to open the project directly in NetBeans.
 
 Hardware
 --------
-I built Moppy using an Arduino UNO, though it should work just fine on most Arduinos.  The pins are connected in pairs to floppy drives as follows: Even pins (2,4,6...) are connected to each drive's STEP pin, the matching odd pins (3,5,7...) are connected to the each drive's DIRECTION control pin.  So the first floppy would be connected to pin 2 & 3, the second floppy to 4 & 5, and so on.
+I built Moppy using an Arduino Uno, though it should work just fine on most Arduinos.  The pins are connected in pairs to floppy drives as follows: Even pins (2,4,6...) are connected to each drive's STEP pin, the matching odd pins (3,5,7...) are connected to the each drive's DIRECTION control pin.  So the first floppy would be connected to pin 2 & 3, the second floppy to 4 & 5, and so on.
 
 
 Some pinout information can be found here: http://pinouts.ru/Storage/InternalDisk_pinout.shtml
@@ -43,7 +44,7 @@ Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the 
 
 Configuration and use
 ---------------------
-- Open up the code in NetBeans (or your favorite IDE) and run it.  Alternatively, you can build the MoppyDesk.jar file and run that.
+- Open up the code in [NetBeans](http://netbeans.org) (or your favorite IDE) and run it.  Alternatively, you can build the MoppyDesk.jar file and run that.
 - Select the COM port that the Arduino is hooked up to from the "Arduino Port" drop-down.  You will need to have this configured before you launch MoppyDesk.
 - Click the "Connect" button to create a new Sequencer connected to the specified COM port.
 - Click the "Load Sequence" button and select a suitable MIDI file (see below).
