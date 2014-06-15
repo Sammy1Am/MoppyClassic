@@ -57,7 +57,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
         if (message.getStatus() > 127 && message.getStatus() < 144) { // Note OFF
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 127));
+            byte pin = (byte) (2 * (message.getStatus() - 127)  + MoppyCOMBridge.FIRST_PIN - 2);
 
             //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
             mb.sendEvent(pin, 0);
@@ -65,7 +65,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
         } else if (message.getStatus() > 143 && message.getStatus() < 160) { // Note ON
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
-            byte pin = (byte) (2 * (message.getStatus() - 143));
+            byte pin = (byte) (2 * (message.getStatus() - 143)  + MoppyCOMBridge.FIRST_PIN - 2);
 
             //Get note number from MIDI message, and look up the period.
             //NOTE: Java bytes range from -128 to 127, but we need to make them
@@ -93,7 +93,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
             if (currentPeriod[message.getStatus() - 224] != 0) {
                 //Convert the MIDI channel being used to the controller pin on the
                 //Arduino by multipying by 2.
-                byte pin = (byte) (2 * (message.getStatus() - 223));
+                byte pin = (byte) (2 * (message.getStatus() - 223) + MoppyCOMBridge.FIRST_PIN - 2);
 
                 double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
 
