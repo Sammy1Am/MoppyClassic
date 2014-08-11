@@ -16,6 +16,8 @@ public class MoppyPlayerOutput implements MoppyReceiver {
      * Periods are in microseconds because that's what the Arduino uses for its
      * clock-cycles in the micro() function, and because milliseconds aren't
      * precise enough for musical notes.
+     * 
+     * Notes are named (e.g. C1-B4) based on scientfic pitch notation (A4=440Hz) 
      */
     public static int[] microPeriods = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
