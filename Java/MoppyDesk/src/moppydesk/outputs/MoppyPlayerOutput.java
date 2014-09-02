@@ -44,6 +44,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     
     MoppyCOMBridge mb;
     SerialPort com;
+    LegatoManager lm = new LegatoManager();
 
     public MoppyPlayerOutput(MoppyCOMBridge newMb) {
         mb = newMb;
@@ -62,8 +63,10 @@ public class MoppyPlayerOutput implements MoppyReceiver {
             byte pin = (byte) (2 * (message.getStatus() - 127));
 
             //System.out.println("Got note OFF on pin: " + (pin & 0xFF));
-            mb.sendEvent(pin, 0);
-            currentPeriod[message.getStatus() - 128] = 0;
+            if(lm.noteOff(message.getMessage()[1] & 0xff)) {
+                mb.sendEvent(pin, 0);
+                currentPeriod[message.getStatus() - 128] = 0;
+            }
         } else if (message.getStatus() > 143 && message.getStatus() < 160) { // Note ON
             //Convert the MIDI channel being used to the controller pin on the
             //Arduino by multipying by 2.
@@ -84,9 +87,12 @@ public class MoppyPlayerOutput implements MoppyReceiver {
 
             //Zero velocity events turn off the pin.
             if (message.getMessage()[2] == 0) {
-                mb.sendEvent(pin, 0);
-                currentPeriod[message.getStatus() - 144] = 0;
+                if(lm.noteOff(message.getMessage()[1] & 0xff)) {
+                    mb.sendEvent(pin, 0);
+                    currentPeriod[message.getStatus() - 144] = 0;
+                }
             } else {
+                lm.noteOn(message.getMessage()[1] & 0xff);
                 mb.sendEvent(pin, period);
                 currentPeriod[message.getStatus() - 144] = period;
             }
