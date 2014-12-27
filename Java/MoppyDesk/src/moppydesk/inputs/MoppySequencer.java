@@ -41,7 +41,7 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
         Sequence sequence = MidiSystem.getSequence(new File(filePath));
         
         sequencer.setSequence(sequence);
-        System.out.println("Loaded sequence with "+(sequence.getTracks().length-1)+" MIDI channels.");
+        System.out.println("Loaded sequence with "+(sequence.getTracks().length-1)+" MIDI tracks.");
         currentSequence = sequence;
     }
     
