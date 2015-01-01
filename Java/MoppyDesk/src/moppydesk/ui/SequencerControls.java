@@ -52,12 +52,16 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     private void updateProgressDisplay() {
         long currentSeconds = seq.getSecondsPosition();
+        long totalSeconds = seq.getSecondsLength();
+        if ((!seq.isRunning()) && (currentSeconds == totalSeconds)) {
+        	seq.setSecondsPosition(0);
+        }
         sequenceProgressSlider.setValue((int) (currentSeconds));
         String currentPosition = String.format("%d:%02d",
                 TimeUnit.SECONDS.toMinutes(currentSeconds),
                 currentSeconds % 60);
         String totalPosition = String.format("%d:%02d",
-                TimeUnit.SECONDS.toMinutes(seq.getSecondsLength()),
+                TimeUnit.SECONDS.toMinutes(totalSeconds),
                 seq.getSecondsLength() % 60);
         currentPositionLabel.setText(currentPosition);
         totalPositionLabel.setText(totalPosition);
