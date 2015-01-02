@@ -67,7 +67,7 @@ public class MoppyCOMBridge {
     /**
      * Sends a '0' period to all drives to silence them.
      */
-    private void silenceDrives() {
+    public void silenceDrives() {
         // Stop notes
         for (int d = FIRST_PIN; d <= MAX_PIN; d += 2) {
             sendArray(new byte[]{(byte) d, (byte) 0, (byte) 0});

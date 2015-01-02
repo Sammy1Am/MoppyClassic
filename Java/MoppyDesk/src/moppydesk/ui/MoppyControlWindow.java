@@ -11,14 +11,20 @@ import moppydesk.outputs.MoppyPlayerOutput;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
+
 import java.awt.Component;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
+
 import moppydesk.*;
 import moppydesk.outputs.MoppyReceiver;
 
@@ -263,6 +269,15 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                     app.rm.setReceiver(ch, outputPlayers.get(os.midiDeviceName));
                 }
             }
+        }
+    }
+    
+    public void silenceDrives() {
+    	Iterator<Entry<String, MoppyReceiver>> it = outputPlayers.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, MoppyReceiver> val = (Entry<String, MoppyReceiver>)it.next();
+            MoppyPlayerOutput mpo = (MoppyPlayerOutput)val.getValue();
+            mpo.silenceDrives();
         }
     }
 

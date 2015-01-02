@@ -57,10 +57,11 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         if ((!seq.isRunning()) && (currentSeconds == totalSeconds)) {
         	currentSeconds = 0;
         	seq.resetSequencer();
-                if (autoResetCB.isSelected())
-                {
-                    app.rm.reset();
-                }
+            controlWindow.silenceDrives();
+            if (autoResetCB.isSelected())
+            {
+                app.rm.reset();
+            }
         }
         sequenceProgressSlider.setValue((int) (currentSeconds));
         String currentPosition = String.format("%d:%02d",
@@ -246,6 +247,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     private void pauseSequencer() {
         seq.stopSequencer();
+        controlWindow.silenceDrives();
         startButton.setText("Start");
         controlWindow.setStatus("...Paused");
     }
@@ -255,6 +257,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
             controlWindow.setStatus("Stopping...");
             seq.stopSequencer();
             seq.resetSequencer();
+            controlWindow.silenceDrives();
             if (autoResetCB.isSelected())
             {
                 app.rm.reset();
