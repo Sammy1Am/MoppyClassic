@@ -29,6 +29,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     MoppyUI app;
     final JFileChooser sequenceChooser = new JFileChooser();
     Timer progressTimer;
+    Timer onStopTimer;
     private boolean isConnected = false;
     private boolean fileLoaded = false;
 
@@ -49,9 +50,16 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
                 updateProgressDisplay();
             }
         });
+        
+        onStopTimer = new Timer(50, new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                onSequencerStop();
+            }
+        });
     }
 
-    private void updateProgressDisplay() {
+    private void onSequencerStop() {
         long currentSeconds = seq.getSecondsPosition();
         long totalSeconds = seq.getSecondsLength();
         if ((!seq.isRunning()) && (currentSeconds == totalSeconds)) {
@@ -63,6 +71,11 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
                 app.rm.reset();
             }
         }
+    }
+    
+    private void updateProgressDisplay() {
+        long currentSeconds = seq.getSecondsPosition();
+        long totalSeconds = seq.getSecondsLength();
         sequenceProgressSlider.setValue((int) (currentSeconds));
         String currentPosition = String.format("%d:%02d",
                 TimeUnit.SECONDS.toMinutes(currentSeconds),
@@ -345,6 +358,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     public void connected() {
         progressTimer.start();
+        onStopTimer.start();
         isConnected = true;
         if (fileLoaded) {
             startButton.setEnabled(true);
@@ -356,6 +370,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         pauseSequencer();
         isConnected = false;
         progressTimer.stop();
+        onStopTimer.stop();
         seq.setReceiver(null); //Clear receiver so there's no connection here.
     }
 }
