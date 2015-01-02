@@ -44,6 +44,10 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     
     MoppyCOMBridge mb;
     SerialPort com;
+    
+    public void silenceDrives() {
+    	mb.silenceDrives();
+    }
 
     public MoppyPlayerOutput(MoppyCOMBridge newMb) {
         mb = newMb;
