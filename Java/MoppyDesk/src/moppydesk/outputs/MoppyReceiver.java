@@ -13,4 +13,5 @@ public interface MoppyReceiver extends Receiver{
      * This should not disconnect or dispose of any connection though.
      */
     public void reset();
+    public void silence();
 }

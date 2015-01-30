@@ -2,7 +2,6 @@ package moppydesk.outputs;
 
 import gnu.io.SerialPort;
 import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Receiver;
 
 /**
  *
@@ -17,7 +16,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
      * clock-cycles in the micro() function, and because milliseconds aren't
      * precise enough for musical notes.
      * 
-     * Notes are named (e.g. C1-B4) based on scientfic pitch notation (A4=440Hz) 
+     * Notes are named (e.g. C1-B4) based on scientific pitch notation (A4=440Hz) 
      */
     public static int[] microPeriods = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -109,5 +108,9 @@ public class MoppyPlayerOutput implements MoppyReceiver {
 
     public void reset() {
         mb.resetDrives();
+    }
+
+    public void silence() {
+        mb.silenceDrives();
     }
 }

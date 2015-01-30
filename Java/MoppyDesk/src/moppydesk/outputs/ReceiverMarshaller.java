@@ -65,7 +65,7 @@ public class ReceiverMarshaller implements MoppyReceiver{
     /**
      * Explicity closes all output receivers, and nulls the array.
      * This differs slightly from the use described in {@link MidiDevice} in that
-     * the ReceiverMarshaller itself is not neccesarily closed when this is called.
+     * the ReceiverMarshaller itself is not necessarily closed when this is called.
      * After being closed, new receivers can continue to be added to the ReceiverMarshaller.
      */
     public void close() {
@@ -79,7 +79,7 @@ public class ReceiverMarshaller implements MoppyReceiver{
 
     /**
      * Finds the unique set of receivers and calls the {@link MoppyReceiver#reset() } method.
-     * We go through the trouble of finding uniques incase the reset is time-consuming.
+     * We go through the trouble of finding unique receivers incase the reset is time-consuming.
      */
     public void reset() {
         ArrayList<MoppyReceiver> uniqueReceivers = new ArrayList<MoppyReceiver>();
@@ -90,6 +90,18 @@ public class ReceiverMarshaller implements MoppyReceiver{
         }
         for (MoppyReceiver r : uniqueReceivers){
             r.reset();
+        }
+    }
+
+    public void silence() {
+        ArrayList<MoppyReceiver> uniqueReceivers = new ArrayList<MoppyReceiver>();
+        for (MoppyReceiver r: outputReceivers){
+            if (r!= null && !uniqueReceivers.contains(r)){
+                uniqueReceivers.add(r);
+            }
+        }
+        for (MoppyReceiver r : uniqueReceivers){
+            r.silence();
         }
     }
 }

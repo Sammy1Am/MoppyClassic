@@ -236,9 +236,8 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(RepeatCB)
                     .addComponent(ResetDrivesCB)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(DelayResetSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2)))
+                    .addComponent(DelayResetSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(currentPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -382,7 +381,8 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     //MrSolidSnake745: Simple use for the SequenceEnded event
     //Resets the sequence and drives if ResetDrivesCB is selected once the song has finished    
     public void SequenceEnded() {  
-        controlWindow.setStatus("Song has ended.");        
+        controlWindow.setStatus("Song has ended.");       
+        app.rm.silence(); //In case there are any stuck notes, most likely from pooling, silence all receivers
         seq.resetSequencer();        
         startButton.setText("Start");
         if(ResetDrivesCB.isSelected()) {
