@@ -282,7 +282,8 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
             controlWindow.setStatus("Stopped.");
         } else {
             app.rm.reset();
-            controlWindow.setStatus("Reset.");
+            seq.resetSequencer();
+            controlWindow.setStatus("Reset.");            
         }
     }
 
