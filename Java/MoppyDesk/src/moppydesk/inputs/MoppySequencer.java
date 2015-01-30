@@ -1,8 +1,5 @@
 package moppydesk.inputs;
 
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,6 +109,13 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
             }
             
             System.out.println("Tempo changed to: " + newTempo);
+        }
+        else if (meta.getType() == 47) {
+            //MrSolidSnake745: Exposing end of sequence event
+            for (MoppyStatusConsumer c : listeners) {
+                c.SequenceEnded();
+            }            
+            System.out.println("End of current sequence");
         }
     }
 

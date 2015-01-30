@@ -4,6 +4,7 @@
  */
 package moppydesk.ui;
 
+import java.awt.Component;
 import moppydesk.inputs.MoppySequencer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,15 +42,29 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         this.controlWindow = mcw;
 
         initComponents();
-
+        loadPreferences();
+        
         progressTimer = new Timer(1000, new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 updateProgressDisplay();
             }
-        });
+        });       
     }
 
+    private void loadPreferences() {
+        ResetDrivesCB.setSelected(app.prefs.getBoolean(Constants.PREF_RESET_DRIVES, false));
+        RepeatCB.setSelected(app.prefs.getBoolean(Constants.PREF_REPEAT_SEQ, false));
+        DelayResetSpinner.setValue(app.prefs.getInt(Constants.PREF_DELAY_RESET, 0));
+        DelayResetSpinner.setEnabled(ResetDrivesCB.isSelected());
+    }
+    
+    private void savePreferences() {
+        app.prefs.putBoolean(Constants.PREF_RESET_DRIVES, ResetDrivesCB.isSelected());
+        app.prefs.putBoolean(Constants.PREF_REPEAT_SEQ, RepeatCB.isSelected());
+        app.prefs.putInt(Constants.PREF_DELAY_RESET, (Integer)DelayResetSpinner.getValue());                
+    }
+    
     private void updateProgressDisplay() {
         long currentSeconds = seq.getSecondsPosition();
         sequenceProgressSlider.setValue((int) (currentSeconds));
@@ -82,6 +97,10 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         sequenceProgressSlider = new javax.swing.JSlider();
         currentPositionLabel = new javax.swing.JLabel();
         totalPositionLabel = new javax.swing.JLabel();
+        RepeatCB = new javax.swing.JCheckBox();
+        ResetDrivesCB = new javax.swing.JCheckBox();
+        DelayResetSpinner = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
 
         jLabel1.setText("Current Sequence:");
 
@@ -139,62 +158,92 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
         totalPositionLabel.setText("00:00");
 
+        RepeatCB.setText("Repeat");
+        RepeatCB.setToolTipText("Repeats the song when selected.");
+
+        ResetDrivesCB.setText("Reset Drives");
+        ResetDrivesCB.setToolTipText("Resets the drives after the end of the current song.");
+        ResetDrivesCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ResetDrivesCBActionPerformed(evt);
+            }
+        });
+
+        DelayResetSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 600, 1));
+        DelayResetSpinner.setToolTipText("Delays resetting the drives after the song ends by a number of seconds.");
+
+        jLabel2.setText("Delay Reset:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(sequenceNameLabel))
+                .addGap(258, 258, 258)
+                .addComponent(loadButton))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(136, 136, 136)
+                .addComponent(bpmLabel))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sequenceNameLabel)
-                            .addComponent(jLabel1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(loadButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(126, 126, 126)
-                        .addComponent(bpmLabel)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(stopButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(DelayResetSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ResetDrivesCB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(RepeatCB))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(currentPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(4, 4, 4)
                         .addComponent(sequenceProgressSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(totalPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .addGap(4, 4, 4)
+                        .addComponent(totalPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(stopButton))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(6, 6, 6)
                         .addComponent(sequenceNameLabel))
                     .addComponent(loadButton))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addComponent(bpmLabel)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(bpmLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(stopButton)
-                            .addComponent(startButton))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(sequenceProgressSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(currentPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(totalPositionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(8, 8, 8)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(startButton)
+                            .addComponent(stopButton))))
+                .addGap(8, 8, 8)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(RepeatCB)
+                    .addComponent(ResetDrivesCB)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(DelayResetSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(currentPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(sequenceProgressSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(totalPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -264,6 +313,10 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
                 seconds % 60));
     }//GEN-LAST:event_sequenceProgressDragged
 
+    private void ResetDrivesCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetDrivesCBActionPerformed
+        DelayResetSpinner.setEnabled(ResetDrivesCB.isSelected());
+    }//GEN-LAST:event_ResetDrivesCBActionPerformed
+
     public void tempoChanged(int newTempo) {
         jSlider1.setValue(newTempo);
         bpmLabel.setText(newTempo + " bpm");
@@ -289,9 +342,13 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSpinner DelayResetSpinner;
+    private javax.swing.JCheckBox RepeatCB;
+    private javax.swing.JCheckBox ResetDrivesCB;
     private javax.swing.JLabel bpmLabel;
     private javax.swing.JLabel currentPositionLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JButton loadButton;
     private javax.swing.JLabel sequenceNameLabel;
@@ -311,6 +368,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         if (fileLoaded) {
             startButton.setEnabled(true);
         }
+        savePreferences();
     }
 
     public void disconnected() {
@@ -319,5 +377,33 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         isConnected = false;
         progressTimer.stop();
         seq.setReceiver(null); //Clear receiver so there's no connection here.
+    }
+
+    //MrSolidSnake745: Simple use for the SequenceEnded event
+    //Resets the sequence and drives if ResetDrivesCB is selected once the song has finished    
+    public void SequenceEnded() {  
+        controlWindow.setStatus("Song has ended.");        
+        seq.resetSequencer();        
+        startButton.setText("Start");
+        if(ResetDrivesCB.isSelected()) {
+            int y = ((Integer)DelayResetSpinner.getValue());
+            if(y > 0) {
+                try {
+                    setEnabledAllControls(false); //Don't want users messing with controls while we delay                
+                    controlWindow.setStatus("Waiting " + y + " seconds before reset...");
+                    Thread.sleep(y * 1000); //Thread is sooooo sleepy...
+                }
+                catch(Exception x){}
+                finally{setEnabledAllControls(true);}
+            }            
+            controlWindow.setStatus("Resetting!");
+            app.rm.reset();
+            controlWindow.setStatus("Reset.");
+        }
+        if(RepeatCB.isSelected()) { playSequencer(); }
+    }
+    
+    public void setEnabledAllControls(boolean value) {
+        for (Component c : this.getComponents()) {c.setEnabled(value);}
     }
 }
