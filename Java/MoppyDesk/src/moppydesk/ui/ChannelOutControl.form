@@ -31,11 +31,9 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="moppyTypeRB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="comComboBox" pref="161" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="MIDITypeRB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="comComboBox" min="-2" pref="63" max="-2" attributes="0"/>
-              <EmptySpace pref="104" max="32767" attributes="0"/>
-              <Component id="midiOutLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="midiOutComboBox" min="-2" pref="130" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -51,7 +49,6 @@
                   <Component id="MIDITypeRB" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="comComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="midiOutComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="midiOutLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="enabledCB" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -64,7 +61,7 @@
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="outputTypeRB"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Moppy"/>
+        <Property name="text" type="java.lang.String" value="Moppy Serial:"/>
         <Property name="toolTipText" type="java.lang.String" value="Sends Moppy-protocol serial data to selected COM port"/>
       </Properties>
       <Events>
@@ -76,7 +73,7 @@
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="outputTypeRB"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="MIDI"/>
+        <Property name="text" type="java.lang.String" value="MIDI Out:"/>
         <Property name="toolTipText" type="java.lang.String" value="Sends MIDI messages through to selected MIDI port"/>
       </Properties>
       <Events>
@@ -104,12 +101,6 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="midiOutComboBoxActionPerformed"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="midiOutLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="MIDI Out:"/>
-        <Property name="enabled" type="boolean" value="false"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="enabledCB">
       <Properties>

@@ -112,13 +112,12 @@ public class ChannelOutControl extends javax.swing.JPanel {
         MIDITypeRB = new javax.swing.JRadioButton();
         comComboBox = new javax.swing.JComboBox();
         midiOutComboBox = new javax.swing.JComboBox();
-        midiOutLabel = new javax.swing.JLabel();
         enabledCB = new javax.swing.JCheckBox();
 
         setPreferredSize(new java.awt.Dimension(525, 23));
 
         outputTypeRB.add(moppyTypeRB);
-        moppyTypeRB.setText("Moppy");
+        moppyTypeRB.setText("Moppy Serial:");
         moppyTypeRB.setToolTipText("Sends Moppy-protocol serial data to selected COM port");
         moppyTypeRB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -127,7 +126,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
         });
 
         outputTypeRB.add(MIDITypeRB);
-        MIDITypeRB.setText("MIDI");
+        MIDITypeRB.setText("MIDI Out:");
         MIDITypeRB.setToolTipText("Sends MIDI messages through to selected MIDI port");
         MIDITypeRB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,9 +158,6 @@ public class ChannelOutControl extends javax.swing.JPanel {
             }
         });
 
-        midiOutLabel.setText("MIDI Out:");
-        midiOutLabel.setEnabled(false);
-
         enabledCB.setText(String.valueOf(settings.MIDIChannel));
         enabledCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -179,11 +175,9 @@ public class ChannelOutControl extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(moppyTypeRB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(comComboBox, 0, 161, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(MIDITypeRB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(comComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 104, Short.MAX_VALUE)
-                .addComponent(midiOutLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(midiOutComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -197,7 +191,6 @@ public class ChannelOutControl extends javax.swing.JPanel {
                     .addComponent(MIDITypeRB)
                     .addComponent(comComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(midiOutComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(midiOutLabel)
                     .addComponent(enabledCB)))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -223,18 +216,16 @@ public class ChannelOutControl extends javax.swing.JPanel {
     private void outputTypeChanged(OutputType newType){
         settings.type = newType;
         if (newType.equals(OutputType.MOPPY)){
-            midiOutLabel.setEnabled(false);
             midiOutComboBox.setEnabled(false);
             comComboBox.setEnabled(true);
         } else {
             comComboBox.setEnabled(false);
-            midiOutLabel.setEnabled(true);
             midiOutComboBox.setEnabled(true);
         }
     }
     
     private void outputTypeChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeChanged
-        if (evt.getActionCommand().equalsIgnoreCase("Moppy")) {
+        if (evt.getSource().equals(moppyTypeRB)) {
             outputTypeChanged(OutputType.MOPPY);
         } else {
             outputTypeChanged(OutputType.MIDI);
@@ -250,7 +241,6 @@ public class ChannelOutControl extends javax.swing.JPanel {
     private javax.swing.JComboBox comComboBox;
     private javax.swing.JCheckBox enabledCB;
     private javax.swing.JComboBox midiOutComboBox;
-    private javax.swing.JLabel midiOutLabel;
     private javax.swing.JRadioButton moppyTypeRB;
     private javax.swing.ButtonGroup outputTypeRB;
     // End of variables declaration//GEN-END:variables

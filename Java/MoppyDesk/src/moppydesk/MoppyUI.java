@@ -8,6 +8,7 @@ import moppydesk.inputs.MoppySequencer;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
+import java.awt.EventQueue;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,13 +20,12 @@ import javax.swing.JOptionPane;
 import moppydesk.inputs.MoppyMIDIInput;
 import moppydesk.outputs.ReceiverMarshaller;
 import moppydesk.ui.MoppyControlWindow;
-import org.jdesktop.application.SingleFrameApplication;
 
 /**
  *
  * @author Sam
  */
-public class MoppyUI extends SingleFrameApplication {
+public class MoppyUI {
 
     //Input objects
     public MoppySequencer ms;
@@ -37,7 +37,6 @@ public class MoppyUI extends SingleFrameApplication {
     public ReceiverMarshaller rm = new ReceiverMarshaller();
     public Preferences prefs = Preferences.userNodeForPackage(MoppyUI.class);
 
-    @Override
     protected void startup() {
         //Initialize parts
         try {
@@ -45,11 +44,11 @@ public class MoppyUI extends SingleFrameApplication {
             midiIn = new MoppyMIDIInput();
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this.getMainFrame(), ex.toString());
+            JOptionPane.showMessageDialog(null, ex.toString());
         }
         MoppyControlWindow mainWindow = new MoppyControlWindow(this);
         mainWindow.setStatus("Initializing...");
-        show(mainWindow);
+        mainWindow.setVisible(true);
         mainWindow.setStatus("Initialized.");
     }
 
@@ -57,7 +56,37 @@ public class MoppyUI extends SingleFrameApplication {
      * Main method launching the application.
      */
     public static void main(String[] args) {
-        launch(MoppyUI.class, args);
+
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Windows".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(MoppyUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MoppyUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MoppyUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MoppyUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                MoppyUI ui = new MoppyUI();
+                ui.startup();
+            }
+        });
     }
 
     public void savePreferences() {

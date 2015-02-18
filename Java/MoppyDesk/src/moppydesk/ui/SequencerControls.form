@@ -143,6 +143,7 @@
     <Component class="javax.swing.JButton" name="stopButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Stop/Reset"/>
+        <Property name="toolTipText" type="java.lang.String" value="Press once to stop sequencer and return to beginning of track.  Press again to reset drives."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stopButtonstopResetClicked"/>

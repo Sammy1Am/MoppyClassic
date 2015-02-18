@@ -128,6 +128,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         });
 
         stopButton.setText("Stop/Reset");
+        stopButton.setToolTipText("Press once to stop sequencer and return to beginning of track.  Press again to reset drives.");
         stopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 stopButtonstopResetClicked(evt);
@@ -285,6 +286,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
             seq.resetSequencer();
             controlWindow.setStatus("Reset.");            
         }
+        updateProgressDisplay(); // Always update the progress here in case we're not connected but want to reset the sequencer
     }
 
     private void stopButtonstopResetClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonstopResetClicked
