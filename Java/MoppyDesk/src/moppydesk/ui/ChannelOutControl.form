@@ -90,6 +90,7 @@
         </Property>
       </Properties>
       <Events>
+        <EventHandler event="popupMenuWillBecomeVisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="comComboBoxPopupMenuWillBecomeVisible"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comComboBoxActionPerformed"/>
       </Events>
     </Component>
