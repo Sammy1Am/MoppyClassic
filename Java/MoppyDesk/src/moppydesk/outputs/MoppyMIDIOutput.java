@@ -73,4 +73,8 @@ public class MoppyMIDIOutput implements MoppyReceiver{
             }
         }
     }
+
+    //MrSolidSnake745: A system reset should suffice
+    //If not, sending a different message would probably work
+    public void silence() { reset(); }
 }

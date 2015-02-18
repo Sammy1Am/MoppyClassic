@@ -6,6 +6,9 @@ package moppydesk;
  */
 public class Constants {
         public static final String PREF_LOADED_SEQ = "loadedSequencePath";
+        public static final String PREF_DELAY_RESET = "delayResetValue";
+        public static final String PREF_RESET_DRIVES = "resetDrivesValue";
+        public static final String PREF_REPEAT_SEQ = "repeatSequenceValue";
         public static final String PREF_OUTPUT_SETTINGS = "outputSettingsArray";
         
         public static final String PREF_POOL_ENABLE = "poolingEnabled";

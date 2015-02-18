@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import moppydesk.outputs.MoppyCOMBridge;
 import moppydesk.OutputSetting;
 import moppydesk.OutputSetting.OutputType;
 
@@ -28,12 +26,11 @@ public class ChannelOutControl extends javax.swing.JPanel {
     public ChannelOutControl(MoppyControlWindow mcw, OutputSetting os) {
         this.settings = os;
         this.controlWindow = mcw;
-        initComponents();
+        initComponents();        
         loadSettings();
     }
 
     private void loadSettings() {
-
         if (settings.enabled) {
             enabledCB.setSelected(true);
             enableControls();
@@ -42,17 +39,21 @@ public class ChannelOutControl extends javax.swing.JPanel {
             disableControls();
         }
 
-
         if (settings.type.equals(OutputType.MOPPY)) {
             moppyTypeRB.setSelected(true);
             outputTypeChanged(OutputType.MOPPY);
         } else {
             MIDITypeRB.setSelected(true);
             outputTypeChanged(OutputType.MIDI);
-        }
-
-        comComboBox.setSelectedItem(settings.comPort);
-        midiOutComboBox.setSelectedItem(settings.midiDeviceName);
+        }        
+                    
+        //MrSolidSnake745: Ensure the saved settings are still valid and load their values
+        //Else default to the first item in the collection
+        if(doesCOMExist(settings.comPort)) {comComboBox.setSelectedItem(settings.comPort);}  
+        else {settings.comPort = (String) comComboBox.getModel().getElementAt(0);}
+                
+        if(doesMIDIExist(settings.midiDeviceName)) {midiOutComboBox.setSelectedItem(settings.midiDeviceName);}  
+        else {settings.midiDeviceName = (String) midiOutComboBox.getModel().getElementAt(0);}
     }
 
     public void lockControl(){
@@ -79,10 +80,24 @@ public class ChannelOutControl extends javax.swing.JPanel {
             outputTypeChanged(new ActionEvent(moppyTypeRB, ActionEvent.ACTION_PERFORMED, moppyTypeRB.getActionCommand()));
         } else if (MIDITypeRB.isSelected()){
             outputTypeChanged(new ActionEvent(MIDITypeRB, ActionEvent.ACTION_PERFORMED, MIDITypeRB.getActionCommand()));
-        }
-        
+        }        
     }
 
+    private boolean doesCOMExist(Object obj) {
+        return (((DefaultComboBoxModel)(comComboBox.getModel())).getIndexOf(obj) > -1);
+    }
+    
+    private boolean doesMIDIExist(Object obj) {
+        return (((DefaultComboBoxModel)(midiOutComboBox.getModel())).getIndexOf(obj) > -1);
+    }
+    
+    //MrSolidSnake745: Method to refresh the list of available COM ports
+    private void refreshAvailablePorts() {
+        comComboBox.setModel(new DefaultComboBoxModel(moppydesk.outputs.MoppyCOMBridge.getAvailableCOMPorts()));
+        if(doesCOMExist(settings.comPort)) {comComboBox.setSelectedItem(settings.comPort);} //To avoid losing last user selected value
+        else {settings.comPort = (String) comComboBox.getModel().getElementAt(0);}  //ActionPerformed event isn't triggered so we need to manually set
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -121,6 +136,15 @@ public class ChannelOutControl extends javax.swing.JPanel {
         });
 
         comComboBox.setModel(new DefaultComboBoxModel(moppydesk.outputs.MoppyCOMBridge.getAvailableCOMPorts()));
+        comComboBox.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                comComboBoxPopupMenuWillBecomeVisible(evt);
+            }
+        });
         comComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comComboBoxActionPerformed(evt);
@@ -179,6 +203,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comComboBoxActionPerformed
+        //MrSolidSnake745: FYI, this fires on initial click to generate dropdown and once more on clicking a value
         settings.comPort = (String) ((JComboBox) evt.getSource()).getSelectedItem();
     }//GEN-LAST:event_comComboBoxActionPerformed
 
@@ -215,6 +240,11 @@ public class ChannelOutControl extends javax.swing.JPanel {
             outputTypeChanged(OutputType.MIDI);
         }
     }//GEN-LAST:event_outputTypeChanged
+
+    private void comComboBoxPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_comComboBoxPopupMenuWillBecomeVisible
+        refreshAvailablePorts();
+    }//GEN-LAST:event_comComboBoxPopupMenuWillBecomeVisible
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton MIDITypeRB;
     private javax.swing.JComboBox comComboBox;
