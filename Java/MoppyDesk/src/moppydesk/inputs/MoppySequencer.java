@@ -113,7 +113,7 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
         else if (meta.getType() == 47) {
             //MrSolidSnake745: Exposing end of sequence event
             for (MoppyStatusConsumer c : listeners) {
-                c.SequenceEnded();
+                c.sequenceEnded();
             }            
             System.out.println("End of current sequence");
         }

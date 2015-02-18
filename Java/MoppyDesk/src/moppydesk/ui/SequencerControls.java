@@ -381,7 +381,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     //MrSolidSnake745: Simple use for the SequenceEnded event
     //Resets the sequence and drives if ResetDrivesCB is selected once the song has finished    
-    public void SequenceEnded() {  
+    public void sequenceEnded() {  
         controlWindow.setStatus("Song has ended.");       
         app.rm.silence(); //In case there are any stuck notes, most likely from pooling, silence all receivers
         seq.resetSequencer();        
