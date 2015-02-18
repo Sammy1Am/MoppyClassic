@@ -101,12 +101,8 @@ public class MoppyCOMBridge {
             }
         }
 
-        if (com != null) {
-            try{
-                com.disconnect();
-            } catch (Exception ex){
-                // No worries, we tried.  Sometimes if the Arduino drops first, there a NPE here.
-            }
+        if (com != null && com.isConnected()) {
+            com.disconnect();
         }
         isOutputOpen = false;
     }
