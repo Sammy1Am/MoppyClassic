@@ -116,6 +116,7 @@ public class SimController implements Runnable{
     private void resetAll(){
         for (SimDrive s : simDrives){
             s.setNote(0);
+            s.resetDrive();
         }
     }
     

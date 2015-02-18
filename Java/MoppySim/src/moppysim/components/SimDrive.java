@@ -33,6 +33,10 @@ public class SimDrive {
         }
     }
     
+    public void resetDrive(){
+        drivePanel.resetDrive();
+    }
+    
     public UnitOutputPort getOutput(){
         return so.getOutput();
     }

@@ -13,6 +13,8 @@ import java.awt.Color;
  */
 public class DrivePanel extends javax.swing.JPanel {
     
+    double lastFrequency;
+    
     /**
      * Creates new form DrivePanel
      */
@@ -48,10 +50,18 @@ public class DrivePanel extends javax.swing.JPanel {
 
 public void playingNote(double frequency){
     if (frequency > 0){
+        lastFrequency = frequency;
         jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(Color.getHSBColor((float)(frequency/500), 1, 1), 3));
+    } else if(lastFrequency>0) {
+        jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(Color.getHSBColor((float)(lastFrequency/500), 1, (float)0.5), 3));
     } else {
         jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(Color.BLACK, 3));
     }
+}
+
+public void resetDrive(){
+    lastFrequency = 0;
+    jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(Color.BLACK, 3));
 }
     
     
