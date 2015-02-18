@@ -1,9 +1,9 @@
 package moppydesk.outputs;
 
 import gnu.io.CommPortIdentifier;
+import gnu.io.NRSerialPort;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,13 +22,13 @@ public class MoppyCOMBridge {
     static int MAX_PIN = 17;
     int SERIAL_RATE = 9600;
     OutputStream os;
-    SerialPort com;
+    NRSerialPort com;
     private boolean isOutputOpen = false;
 
     public MoppyCOMBridge(String portName) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
-        CommPortIdentifier cpi = CommPortIdentifier.getPortIdentifier(portName);
-        com = (SerialPort) cpi.open("MoppyDesk", 2000);
-        com.setSerialPortParams(SERIAL_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+        com = new NRSerialPort(portName, SERIAL_RATE);
+        com.connect();
+        
         os = com.getOutputStream();
         isOutputOpen = true;
     }
@@ -102,7 +102,11 @@ public class MoppyCOMBridge {
         }
 
         if (com != null) {
-            com.close();
+            try{
+                com.disconnect();
+            } catch (Exception ex){
+                // No worries, we tried.  Sometimes if the Arduino drops first, there a NPE here.
+            }
         }
         isOutputOpen = false;
     }
