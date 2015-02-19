@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
@@ -98,6 +99,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moppy Control Application");
+        setIconImage(new javax.swing.ImageIcon(MoppyControlWindow.class.getResource("/moppydesk/ui/moppy_ico.png")).getImage());
+        setResizable(false);
 
         mainStatusLabel.setText("Loaded.");
         mainStatusLabel.setToolTipText("Current status");

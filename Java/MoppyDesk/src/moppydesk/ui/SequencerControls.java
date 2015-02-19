@@ -272,17 +272,25 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     private void stopResetSequencer() {
         if (seq.isRunning()) {
-            controlWindow.setStatus("Stopping...");
+            stopSeq();
+        } else {
+            resetSeq();           
+        }
+        updateProgressDisplay(); // Always update the progress here in case we're not connected but want to reset the sequencer
+    }
+    
+    private void stopSeq(){
+        controlWindow.setStatus("Stopping...");
             seq.stopSequencer();
             seq.resetSequencer();
             startButton.setText("Start");
             controlWindow.setStatus("Stopped.");
-        } else {
-            app.rm.reset();
+    }
+    
+    private void resetSeq(){
+        app.rm.reset();
             seq.resetSequencer();
-            controlWindow.setStatus("Reset.");            
-        }
-        updateProgressDisplay(); // Always update the progress here in case we're not connected but want to reset the sequencer
+            controlWindow.setStatus("Reset."); 
     }
 
     private void stopButtonstopResetClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonstopResetClicked
@@ -322,6 +330,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     private void loadSequenceFile(File sequenceFile) {
         try {
+            stopSeq();
             controlWindow.setStatus("Loading file...");
             seq.loadFile(sequenceFile.getPath());
             sequenceNameLabel.setText(sequenceFile.getName());
