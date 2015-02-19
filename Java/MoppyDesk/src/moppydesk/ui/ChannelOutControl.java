@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk.ui;
 
 import java.awt.event.ActionEvent;
@@ -13,7 +9,7 @@ import moppydesk.OutputSetting.OutputType;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class ChannelOutControl extends javax.swing.JPanel {
 
@@ -31,21 +27,22 @@ public class ChannelOutControl extends javax.swing.JPanel {
     }
 
     private void loadSettings() {
-        if (settings.enabled) {
-            enabledCB.setSelected(true);
-            enableControls();
-        } else {
-            enabledCB.setSelected(false);
-            disableControls();
-        }
-
+        
         if (settings.type.equals(OutputType.MOPPY)) {
             moppyTypeRB.setSelected(true);
             outputTypeChanged(OutputType.MOPPY);
         } else {
             MIDITypeRB.setSelected(true);
             outputTypeChanged(OutputType.MIDI);
-        }        
+        } 
+        
+        if (settings.enabled) {
+            enabledCB.setSelected(true);
+            enableControls();
+        } else {
+            enabledCB.setSelected(false);
+            disableControls();
+        }      
                     
         //MrSolidSnake745: Ensure the saved settings are still valid and load their values
         //Else default to the first item in the collection
@@ -63,7 +60,7 @@ public class ChannelOutControl extends javax.swing.JPanel {
     
     public void unlockControl(){
         enabledCB.setEnabled(true);
-        enableControls();
+        if (enabledCB.isSelected()) enableControls();
     }
     
     private void disableControls() {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppysim.comm;
 
 import com.jsyn.JSyn;
@@ -19,7 +14,7 @@ import moppysim.components.SimDrive;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class SimController implements Runnable{
     
@@ -66,7 +61,9 @@ public class SimController implements Runnable{
         serial.connect();
     }
     
-    public void disconnect(String comPort){
+    public void disconnect(){
+        stop();
+        resetAll();
         if (serial != null){
             serial.disconnect();
         }

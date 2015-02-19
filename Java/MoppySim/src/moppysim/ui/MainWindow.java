@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppysim.ui;
 
 import javax.swing.DefaultComboBoxModel;
@@ -11,7 +6,7 @@ import moppysim.components.SimDrive;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class MainWindow extends javax.swing.JFrame {
 
@@ -102,6 +97,7 @@ public class MainWindow extends javax.swing.JFrame {
             connectButton.setText("Connect");
             comSelectBox.setEnabled(true);
             sc.stop();
+            sc.disconnect();
         }
     }//GEN-LAST:event_connectButtonActionPerformed
 
@@ -134,6 +130,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new MainWindow().setVisible(true);
             }
