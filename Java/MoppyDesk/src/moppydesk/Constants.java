@@ -2,7 +2,7 @@ package moppydesk;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class Constants {
         public static final String PREF_LOADED_SEQ = "loadedSequencePath";
@@ -17,6 +17,9 @@ public class Constants {
         public static final String PREF_POOL_TO_START = "poolingToStart";
         public static final String PREF_POOL_TO_END = "poolingToEnd";
         public static final String PREF_POOL_STRATEGY = "poolingStrategy";
+        
+        public static final String PREF_FILTER_CONSTRAIN = "filterAutoConstrain";
+        public static final String PREF_FILTER_IGNORETEN = "ignore10";
         
         public static final int NUM_MIDI_CHANNELS = 16;
 }

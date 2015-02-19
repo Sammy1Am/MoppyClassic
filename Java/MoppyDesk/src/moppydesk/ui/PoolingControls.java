@@ -184,8 +184,7 @@ public class PoolingControls extends javax.swing.JPanel {
                     .addGroup(poolingChannelPannelLayout.createSequentialGroup()
                         .addComponent(outputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(93, 93, 93)))
+                        .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         poolingChannelPannelLayout.setVerticalGroup(
@@ -242,13 +241,10 @@ public class PoolingControls extends javax.swing.JPanel {
         poolStratPanel.setLayout(poolStratPanelLayout);
         poolStratPanelLayout.setHorizontalGroup(
             poolStratPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(poolStratPanelLayout.createSequentialGroup()
-                .addGroup(poolStratPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(straightThroughRB)
-                    .addComponent(rndRbnRB)
-                    .addComponent(stkRB))
-                .addGap(0, 82, Short.MAX_VALUE))
+            .addComponent(jLabel3)
+            .addComponent(straightThroughRB)
+            .addComponent(rndRbnRB)
+            .addComponent(stkRB)
         );
         poolStratPanelLayout.setVerticalGroup(
             poolStratPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -274,7 +270,7 @@ public class PoolingControls extends javax.swing.JPanel {
                     .addComponent(poolingChannelPannel, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(poolStratPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

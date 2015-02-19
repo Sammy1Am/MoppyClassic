@@ -48,7 +48,11 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="mainInputPanel" pref="529" max="32767" attributes="0"/>
-                                  <Component id="poolingControls1" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="filterControls1" min="-2" pref="171" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="poolingControls1" pref="0" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="mainOutputPanel" min="-2" pref="550" max="-2" attributes="0"/>
@@ -74,8 +78,16 @@
                   <Component id="mainOutputPanel" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="mainInputPanel" pref="0" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="poolingControls1" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="poolingControls1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                              <Component id="filterControls1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -158,6 +170,11 @@
     <Component class="moppydesk.ui.PoolingControls" name="poolingControls1">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new PoolingControls(app);"/>
+      </AuxValues>
+    </Component>
+    <Component class="moppydesk.ui.FilterControls" name="filterControls1">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FilterControls(app);"/>
       </AuxValues>
     </Component>
   </SubComponents>

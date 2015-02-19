@@ -38,7 +38,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="poolStratPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="79" max="32767" attributes="0"/>
+              <EmptySpace pref="187" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -89,7 +89,6 @@
                           <Component id="outputStartSpinner" min="-2" pref="41" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="outputEndSpinner" min="-2" pref="41" max="-2" attributes="0"/>
-                          <EmptySpace min="93" pref="93" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -181,15 +180,10 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                      <Component id="straightThroughRB" min="-2" max="-2" attributes="0"/>
-                      <Component id="rndRbnRB" min="-2" max="-2" attributes="0"/>
-                      <Component id="stkRB" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="0" pref="82" max="32767" attributes="0"/>
-              </Group>
+              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+              <Component id="straightThroughRB" min="-2" max="-2" attributes="0"/>
+              <Component id="rndRbnRB" min="-2" max="-2" attributes="0"/>
+              <Component id="stkRB" min="-2" max="-2" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
