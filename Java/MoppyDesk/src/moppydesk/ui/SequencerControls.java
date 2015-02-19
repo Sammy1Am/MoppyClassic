@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk.ui;
 
 import java.awt.Component;
@@ -21,7 +17,7 @@ import moppydesk.*;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class SequencerControls extends InputPanel implements MoppyStatusConsumer {
 

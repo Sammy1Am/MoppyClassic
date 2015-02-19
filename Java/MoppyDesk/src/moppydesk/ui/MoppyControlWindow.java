@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk.ui;
 
 import moppydesk.inputs.MoppySequencer;
@@ -24,7 +20,7 @@ import moppydesk.outputs.MoppyReceiver;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class MoppyControlWindow extends javax.swing.JFrame {
 
@@ -224,9 +220,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
 
     private void disconnect() {
         setStatus("Disconnecting...");
+        app.rm.close();
         currentInputPanel.disconnected();
         poolingControls1.disconnected();
-        app.rm.close();
         
         //Reenable output settings
         for (Component c : mainOutputPanel.getComponents()){

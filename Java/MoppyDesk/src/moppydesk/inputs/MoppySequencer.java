@@ -24,6 +24,7 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
 
     Sequencer sequencer;
     Sequence currentSequence = null;
+    Transmitter sequenceTransmitter; // Because we'll be piping all the messages to a common receiver, we'll only need one of these
     ArrayList<MoppyStatusConsumer> listeners = new ArrayList<MoppyStatusConsumer>(1);
 
     public MoppySequencer() throws MidiUnavailableException {
@@ -31,6 +32,7 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
         sequencer = MidiSystem.getSequencer(false);
         sequencer.open();
         sequencer.addMetaEventListener(this);
+        sequenceTransmitter = sequencer.getTransmitter(); // This method creates a new transmitter each time it's called!
     }
 
     public void loadFile(String filePath) throws InvalidMidiDataException, IOException, MidiUnavailableException {
@@ -120,20 +122,11 @@ public class MoppySequencer implements MetaEventListener, Transmitter{
     }
 
     public void setReceiver(Receiver receiver) {
-        try {
-            sequencer.getTransmitter().setReceiver(receiver);
-        } catch (MidiUnavailableException ex) {
-            Logger.getLogger(MoppySequencer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            sequenceTransmitter.setReceiver(receiver);
     }
 
     public Receiver getReceiver() {
-        try {
-            return sequencer.getReceiver();
-        } catch (MidiUnavailableException ex) {
-            Logger.getLogger(MoppySequencer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return sequenceTransmitter.getReceiver();
     }
 
     public void close() {
