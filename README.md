@@ -26,7 +26,7 @@ Installation
 The Arduino code requires the TimeOne library available here: http://www.arduino.cc/playground/Code/Timer1
 
 
-You will need to follow the directions in the appropriate Java/SerialDrivers folder for your system to install the serial drivers prior to running Moppy.
+The latest build is using NRJavaSerial, which should include suitable native drives for most systems.  If you've previously run an older version of Moppy, you'll need to make sure that the RXTX jar file(s) are **not** being loaded (i.e. not on the classpath, &c.), since the two libraries will conflict if both present.
 
 
 Upload the included Arduino code to the Arduino of your choice (requires [Arduino IDE](http://arduino.cc/en/Main/Software)), and open up the included Java code in your favorite IDE.  This code includes a NetBeans project for your convenience, so you should be able to open the project directly in NetBeans.
