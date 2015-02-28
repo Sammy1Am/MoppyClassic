@@ -1,6 +1,5 @@
 package moppydesk.ui;
 
-import moppydesk.inputs.MoppySequencer;
 import moppydesk.outputs.MoppyMIDIOutput;
 import moppydesk.outputs.MoppyCOMBridge;
 import moppydesk.outputs.MoppyPlayerOutput;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
@@ -33,6 +31,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     
     MIDIInControls midiInControls;
     SequencerControls seqControls;
+    PlaylistControls playControls;
     
     InputPanel currentInputPanel;
 
@@ -44,7 +43,10 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         
         midiInControls = new MIDIInControls(app.midiIn);
         seqControls = new SequencerControls(app, this, app.ms);
-        app.ms.addListener(seqControls);
+        playControls = new PlaylistControls(app, this, app.ms);
+        
+        //MrSolidSnake745: Should not be necessary now since we add the listener while setting the current control
+        //app.ms.addListener(seqControls);
         
         availableMIDIOuts = MoppyMIDIOutput.getMIDIOutInfos();
         loadOutputSettings();
@@ -108,7 +110,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         mainInputPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         mainInputPanel.setPreferredSize(new java.awt.Dimension(350, 400));
 
-        inputSelectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MIDI File", "MIDI IN Port" }));
+        inputSelectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MIDI File", "MIDI IN Port", "Playlist" }));
         inputSelectBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inputSelectBoxActionPerformed(evt);
@@ -152,11 +154,11 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(mainInputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(filterControls1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(poolingControls1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                                        .addComponent(poolingControls1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                    .addComponent(mainInputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(mainOutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(mainStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -247,10 +249,10 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         
         //Reenable output settings
         for (Component c : mainOutputPanel.getComponents()){
-                if (c instanceof ChannelOutControl){
-                    ((ChannelOutControl)c).unlockControl();
-                }
+            if (c instanceof ChannelOutControl){
+                ((ChannelOutControl)c).unlockControl();
             }
+        }
         
         inputSelectBox.setEnabled(true);
         connectButton.setText("Connect");
@@ -284,12 +286,20 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
 
     private void updateInputPanel(){
-        mainInputPanel.removeAll();
-        if (inputSelectBox.getSelectedIndex() == 0){ //MIDI File
-            currentInputPanel = seqControls;
-        } else { //MIDI IN
-            currentInputPanel = midiInControls;
+        //MrSolidSnake745: Necessary after implementing sequenceEnded event and having multiple input panels
+        //Without removing listener, sequenceEnded can fire on all panels implementing MoppyStatusConsumer even if they are not the current input panel
+        //Applies to all events defined through MoppyStatusConsumer
+        if (currentInputPanel instanceof MoppyStatusConsumer) app.ms.removeListener((MoppyStatusConsumer) currentInputPanel);
+        mainInputPanel.removeAll();        
+        switch(inputSelectBox.getSelectedIndex())
+        {
+            case 0: currentInputPanel = seqControls; break; //MIDI File
+            case 1: currentInputPanel = midiInControls; break; //MIDI In
+            case 2: currentInputPanel = playControls; break; //Playlist                        
         }
+        //Adding listener back for the selected panel if it implements MoppyStatusConsumer
+        if (currentInputPanel instanceof MoppyStatusConsumer) app.ms.addListener((MoppyStatusConsumer) currentInputPanel);
+        
         mainInputPanel.add(currentInputPanel);
         mainInputPanel.revalidate();
         mainInputPanel.repaint();

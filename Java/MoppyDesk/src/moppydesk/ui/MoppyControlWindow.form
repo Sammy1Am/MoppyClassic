@@ -51,12 +51,12 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="mainInputPanel" pref="529" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="filterControls1" min="-2" pref="171" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="poolingControls1" pref="0" max="32767" attributes="0"/>
                                   </Group>
+                                  <Component id="mainInputPanel" min="-2" pref="529" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="mainOutputPanel" min="-2" pref="550" max="-2" attributes="0"/>
@@ -131,9 +131,10 @@
     <Component class="javax.swing.JComboBox" name="inputSelectBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
+          <StringArray count="3">
             <StringItem index="0" value="MIDI File"/>
             <StringItem index="1" value="MIDI IN Port"/>
+            <StringItem index="2" value="Playlist"/>
           </StringArray>
         </Property>
       </Properties>
