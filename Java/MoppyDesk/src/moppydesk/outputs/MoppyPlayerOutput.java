@@ -31,6 +31,11 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     };
     
     /**
+     * Maximum number of cents to bend +/-.
+     */
+    private static int BEND_CENTS = 200;
+    
+    /**
      * Resolution of the Arduino code in microSeconds.
      */
     public static int ARDUINO_RESOLUTION = 40;
@@ -96,10 +101,11 @@ public class MoppyPlayerOutput implements MoppyReceiver {
                 //Arduino by multipying by 2.
                 byte pin = (byte) (2 * (message.getStatus() - 223));
 
-                double pitchBend = ((message.getMessage()[2] & 0xff) << 8) + (message.getMessage()[1] & 0xff);
-
-                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (pitchBend - 8192) / 8192));
-                //System.out.println(currentPeriod[message.getStatus() - 224] + "-" + period);
+                double pitchBend = ((message.getMessage()[2] & 0xff) << 7) + (message.getMessage()[1] & 0xff);
+                //System.out.println("Pitch bend " + pitchBend); 
+                // Calculate the new period based on the desired maximum bend and the current pitchBend value
+                int period = (int) (currentPeriod[message.getStatus() - 224] / Math.pow(2.0, (BEND_CENTS/1200.0)*((pitchBend - 8192.0) / 8192.0)));
+                //System.out.println("Bent by " + Math.pow(2.0, (bendCents/1200.0)*((pitchBend - 8192.0) / 8192.0)));
                 mb.sendEvent(pin, period);
             }
         }
