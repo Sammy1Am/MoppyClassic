@@ -19,7 +19,7 @@ import moppydesk.*;
  *
  * @author Sammy1Am
  */
-public class SequencerControls extends InputPanel implements MoppyStatusConsumer {
+public final class SequencerControls extends InputPanel implements MoppyStatusConsumer {
 
     MoppySequencer seq;
     MoppyControlWindow controlWindow;
@@ -37,8 +37,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         this.app = app;
         this.controlWindow = mcw;
 
-        initComponents();
-        loadPreferences();
+        initComponents();        
         
         progressTimer = new Timer(1000, new ActionListener() {
 
@@ -48,14 +47,16 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         });       
     }
 
-    private void loadPreferences() {
+    @Override
+    public void loadPreferences() {
         ResetDrivesCB.setSelected(app.prefs.getBoolean(Constants.PREF_RESET_DRIVES, false));
         RepeatCB.setSelected(app.prefs.getBoolean(Constants.PREF_REPEAT_SEQ, false));
         DelayResetSpinner.setValue(app.prefs.getInt(Constants.PREF_DELAY_RESET, 0));
         DelayResetSpinner.setEnabled(ResetDrivesCB.isSelected());
     }
     
-    private void savePreferences() {
+    @Override
+    public void savePreferences() {
         app.prefs.putBoolean(Constants.PREF_RESET_DRIVES, ResetDrivesCB.isSelected());
         app.prefs.putBoolean(Constants.PREF_REPEAT_SEQ, RepeatCB.isSelected());
         app.prefs.putInt(Constants.PREF_DELAY_RESET, (Integer)DelayResetSpinner.getValue());                
@@ -334,6 +335,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
         DelayResetSpinner.setEnabled(ResetDrivesCB.isSelected());
     }//GEN-LAST:event_ResetDrivesCBActionPerformed
 
+    @Override
     public void tempoChanged(int newTempo) {
         jSlider1.setValue(newTempo);
         bpmLabel.setText(newTempo + " bpm");
@@ -376,19 +378,21 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
     private javax.swing.JLabel totalPositionLabel;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public Transmitter getTransmitter() {
         return seq;
     }
 
+    @Override
     public void connected() {
         progressTimer.start();
         isConnected = true;
         if (fileLoaded) {
             startButton.setEnabled(true);
-        }
-        savePreferences();
+        }        
     }
 
+    @Override
     public void disconnected() {
         startButton.setEnabled(false);
         pauseSequencer();
@@ -399,6 +403,7 @@ public class SequencerControls extends InputPanel implements MoppyStatusConsumer
 
     //MrSolidSnake745: Simple use for the SequenceEnded event
     //Resets the sequence and drives if ResetDrivesCB is selected once the song has finished    
+    @Override
     public void sequenceEnded() {  
         controlWindow.setStatus("Song has ended.");       
         app.rm.silence(); //In case there are any stuck notes, most likely from pooling, silence all receivers

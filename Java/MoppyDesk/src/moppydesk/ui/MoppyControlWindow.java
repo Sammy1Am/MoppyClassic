@@ -45,6 +45,12 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         seqControls = new SequencerControls(app, this, app.ms);
         playControls = new PlaylistControls(app, this, app.ms);
         
+        //MrSolidSnake745: Telling all controls to load their preferences
+        //TODO: Create a collection of InputPanels that holds all controls and can be binded to the dropdown; then we can iterate through the collection and tell each one to load prefs
+        midiInControls.loadPreferences();
+        seqControls.loadPreferences();
+        playControls.loadPreferences();
+        
         //MrSolidSnake745: Should not be necessary now since we add the listener while setting the current control
         //app.ms.addListener(seqControls);
         
@@ -212,6 +218,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             app.putPreferenceObject(Constants.PREF_OUTPUT_SETTINGS, outputSettings);
             app.savePreferences();
             
+            //MrSolidSnake745: Tell the current input panel to save it's preferences
+            currentInputPanel.savePreferences();
+            
             setStatus("Initializing Receivers...");
             initializeReceivers();
             
@@ -285,11 +294,14 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         }
     }
 
-    private void updateInputPanel(){
-        //MrSolidSnake745: Necessary after implementing sequenceEnded event and having multiple input panels
-        //Without removing listener, sequenceEnded can fire on all panels implementing MoppyStatusConsumer even if they are not the current input panel
-        //Applies to all events defined through MoppyStatusConsumer
-        if (currentInputPanel instanceof MoppyStatusConsumer) app.ms.removeListener((MoppyStatusConsumer) currentInputPanel);
+    private void updateInputPanel(){        
+        if (currentInputPanel != null) { //Panel is only null on initial load, also helps prevent unecessary preference saving
+            currentInputPanel.savePreferences(); //Tell the current panel to save preferences before switching
+            //MrSolidSnake745: Necessary after implementing sequenceEnded event and having multiple input panels
+            //Without removing listener, sequenceEnded can fire on all panels implementing MoppyStatusConsumer even if they are not the current input panel
+            //Applies to all events defined through MoppyStatusConsumer
+            if (currentInputPanel instanceof MoppyStatusConsumer) app.ms.removeListener((MoppyStatusConsumer) currentInputPanel);
+        }
         mainInputPanel.removeAll();        
         switch(inputSelectBox.getSelectedIndex())
         {
