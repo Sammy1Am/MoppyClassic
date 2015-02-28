@@ -10,5 +10,5 @@ package moppydesk;
  */
 public interface MoppyStatusConsumer {
     public void tempoChanged(int newTempo);
-    public void SequenceEnded();
+    public void sequenceEnded();
 }

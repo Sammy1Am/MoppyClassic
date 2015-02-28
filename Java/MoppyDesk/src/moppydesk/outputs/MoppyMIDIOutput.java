@@ -74,7 +74,24 @@ public class MoppyMIDIOutput implements MoppyReceiver{
         }
     }
 
-    //MrSolidSnake745: A system reset should suffice
-    //If not, sending a different message would probably work
-    public void silence() { reset(); }
+    
+    /**
+     * Since the goal here is to silence any playing devices, we'll pass the "All Note Off" command to
+     * each channel.  Hopefully the receiving devices understand this message.
+     */
+    public void silence() {
+        if (deviceReceiver != null) {
+            try {
+                ShortMessage silenceMessage = new ShortMessage();
+                
+                for (int channelCode=176;channelCode<=191;channelCode++){
+                    silenceMessage.setMessage(channelCode, 123, 0);
+                    deviceReceiver.send(silenceMessage, (long) -1);
+                }
+                
+            } catch (InvalidMidiDataException ex) {
+                Logger.getLogger(MoppyMIDIOutput.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 }

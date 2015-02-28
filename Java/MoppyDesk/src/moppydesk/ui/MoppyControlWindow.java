@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package moppydesk.ui;
 
 import moppydesk.inputs.MoppySequencer;
@@ -16,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JOptionPane;
@@ -24,7 +21,7 @@ import moppydesk.outputs.MoppyReceiver;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class MoppyControlWindow extends javax.swing.JFrame {
 
@@ -98,9 +95,12 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         mainOutputPanel = new javax.swing.JPanel();
         connectButton = new javax.swing.JButton();
         poolingControls1 = new PoolingControls(app);
+        filterControls1 = new FilterControls(app);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moppy Control Application");
+        setIconImage(new javax.swing.ImageIcon(MoppyControlWindow.class.getResource("/moppydesk/ui/moppy_ico.png")).getImage());
+        setResizable(false);
 
         mainStatusLabel.setText("Loaded.");
         mainStatusLabel.setToolTipText("Current status");
@@ -153,7 +153,10 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(mainInputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
-                                    .addComponent(poolingControls1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(filterControls1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(poolingControls1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(mainOutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(mainStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -171,8 +174,13 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                     .addComponent(mainOutputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(mainInputPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(poolingControls1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(poolingControls1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(filterControls1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(connectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -188,6 +196,11 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     private void connect() {
         try {
             
+            //Let the control pannels know they're connected.
+            currentInputPanel.connected();
+            poolingControls1.connected();
+            filterControls1.connected();
+            
             //Disable and save output settings...
             for (Component c : mainOutputPanel.getComponents()){
                 if (c instanceof ChannelOutControl){
@@ -202,16 +215,19 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             
             //If pooling is enabled, send messages through pooler, otherwise bypass it
             inputSelectBox.setEnabled(false);
+            
+            // Always connect to the note filter
+            seqControls.getTransmitter().setReceiver(filterControls1.getNoteFilter());
+            
+            // Only connect to pooling if it's enabled.
             if (poolingControls1.isPoolingEnabled()){
-                currentInputPanel.getTransmitter().setReceiver(poolingControls1.getDrivePooler());
+                filterControls1.getNoteFilter().setReceiver(poolingControls1.getDrivePooler());
                 poolingControls1.getDrivePooler().setReceiver(app.rm);
             } else {
-                currentInputPanel.getTransmitter().setReceiver(app.rm);
+                filterControls1.getNoteFilter().setReceiver(app.rm);
             }
             
-            //Let the control pannels know they're connected.
-            currentInputPanel.connected();
-            poolingControls1.connected();
+
             
             connectButton.setText("Disconnect");
             setStatus("Connected.");
@@ -224,9 +240,10 @@ public class MoppyControlWindow extends javax.swing.JFrame {
 
     private void disconnect() {
         setStatus("Disconnecting...");
+        app.rm.close();
         currentInputPanel.disconnected();
         poolingControls1.disconnected();
-        app.rm.close();
+        filterControls1.disconnected();
         
         //Reenable output settings
         for (Component c : mainOutputPanel.getComponents()){
@@ -298,6 +315,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton connectButton;
+    private moppydesk.ui.FilterControls filterControls1;
     private javax.swing.JComboBox inputSelectBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JSeparator jSeparator1;

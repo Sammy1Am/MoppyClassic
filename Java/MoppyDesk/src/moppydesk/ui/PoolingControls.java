@@ -1,13 +1,16 @@
 package moppydesk.ui;
 
 import java.awt.Component;
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
+import javax.swing.JRadioButton;
 import moppydesk.Constants;
 import moppydesk.MoppyUI;
 import moppydesk.midputs.DrivePooler;
 
 /**
  *
- * @author Sam
+ * @author Sammy1Am
  */
 public class PoolingControls extends javax.swing.JPanel {
 
@@ -44,6 +47,7 @@ public class PoolingControls extends javax.swing.JPanel {
         saveSettings();
         for (Component c : this.getComponents()) {
             c.setEnabled(false);
+            setControlsEnabled(false);
         }
     }
 
@@ -51,6 +55,7 @@ public class PoolingControls extends javax.swing.JPanel {
         pooler.close();
         for (Component c : this.getComponents()) {
             c.setEnabled(true);
+            setControlsEnabled(enablePoolingCB.isSelected());
         }
     }
 
@@ -61,7 +66,17 @@ public class PoolingControls extends javax.swing.JPanel {
         outputStartSpinner.setValue(app.prefs.getInt(Constants.PREF_POOL_TO_START, 1));
         outputEndSpinner.setValue(app.prefs.getInt(Constants.PREF_POOL_TO_END, 1));
 
-        jComboBox1.setSelectedIndex(app.prefs.getInt(Constants.PREF_POOL_STRATEGY, 0));
+        switch (app.prefs.getInt(Constants.PREF_POOL_STRATEGY, 0)){
+            case 0:
+                straightThroughRB.setSelected(true);
+                break;
+            case 1:
+                rndRbnRB.setSelected(true);
+                break;
+            case 2:
+                stkRB.setSelected(true);
+                break;
+        }
 
         updatePooler();
     }
@@ -74,14 +89,15 @@ public class PoolingControls extends javax.swing.JPanel {
         app.prefs.putInt(Constants.PREF_POOL_TO_START, (Integer) outputStartSpinner.getValue());
         app.prefs.putInt(Constants.PREF_POOL_TO_END, (Integer) outputEndSpinner.getValue());
 
-        app.prefs.putInt(Constants.PREF_POOL_STRATEGY, jComboBox1.getSelectedIndex());
+        app.prefs.putInt(Constants.PREF_POOL_STRATEGY, getSelectedStrat().ordinal());
         app.savePreferences();
     }
 
     private void updatePooler() {
         pooler.setInputRange((Integer) inputStartSpinner.getValue(), (Integer) inputEndSpinner.getValue());
         pooler.setOutputRange((Integer) outputStartSpinner.getValue(), (Integer) outputEndSpinner.getValue());
-        pooler.setStrategy(DrivePooler.PoolingStrategy.values()[jComboBox1.getSelectedIndex()]);
+        
+        pooler.setStrategy(getSelectedStrat());
     }
 
     /**
@@ -93,20 +109,30 @@ public class PoolingControls extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        poolStratBG = new javax.swing.ButtonGroup();
         enablePoolingCB = new javax.swing.JCheckBox();
+        poolingChannelPannel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         inputStartSpinner = new javax.swing.JSpinner();
         inputEndSpinner = new javax.swing.JSpinner();
+        outputStartSpinner = new javax.swing.JSpinner();
         jLabel2 = new javax.swing.JLabel();
         outputEndSpinner = new javax.swing.JSpinner();
-        outputStartSpinner = new javax.swing.JSpinner();
+        poolStratPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        straightThroughRB = new javax.swing.JRadioButton();
+        rndRbnRB = new javax.swing.JRadioButton();
+        stkRB = new javax.swing.JRadioButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
         setPreferredSize(new java.awt.Dimension(525, 149));
 
         enablePoolingCB.setText("Enable Drive-Pooling");
+        enablePoolingCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enablePoolingCBActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Pool channels:");
 
@@ -124,6 +150,13 @@ public class PoolingControls extends javax.swing.JPanel {
             }
         });
 
+        outputStartSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 16, 1));
+        outputStartSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                poolingControlChanged(evt);
+            }
+        });
+
         jLabel2.setText("Into channels:");
 
         outputEndSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 16, 1));
@@ -133,21 +166,98 @@ public class PoolingControls extends javax.swing.JPanel {
             }
         });
 
-        outputStartSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 16, 1));
-        outputStartSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                poolingControlChanged(evt);
-            }
-        });
+        javax.swing.GroupLayout poolingChannelPannelLayout = new javax.swing.GroupLayout(poolingChannelPannel);
+        poolingChannelPannel.setLayout(poolingChannelPannelLayout);
+        poolingChannelPannelLayout.setHorizontalGroup(
+            poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                        .addComponent(inputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(inputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                        .addComponent(outputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        poolingChannelPannelLayout.setVerticalGroup(
+            poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(inputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(inputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(poolingChannelPannelLayout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(poolingChannelPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(outputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         jLabel3.setText("Using strategy:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Straight-through", "Round-Robin", "Stacking (Start-biased)" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        poolStratBG.add(straightThroughRB);
+        straightThroughRB.setText("Straight-Through");
+        straightThroughRB.setToolTipText("Essentially does nothing.  Mostly here for testing.");
+        straightThroughRB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                strategyDropdownChanged(evt);
+                poolingStratChanged(evt);
             }
         });
+
+        poolStratBG.add(rndRbnRB);
+        rndRbnRB.setSelected(true);
+        rndRbnRB.setText("Round-Robin");
+        rndRbnRB.setToolTipText("Outputs to each channel in a round-robin fashion, attempting to find empty channels first.");
+        rndRbnRB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                poolingStratChanged(evt);
+            }
+        });
+
+        poolStratBG.add(stkRB);
+        stkRB.setText("Stacking");
+        stkRB.setToolTipText("Uses first available output channel (drops notes if all drives are busy)");
+        stkRB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                poolingStratChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout poolStratPanelLayout = new javax.swing.GroupLayout(poolStratPanel);
+        poolStratPanel.setLayout(poolStratPanelLayout);
+        poolStratPanelLayout.setHorizontalGroup(
+            poolStratPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel3)
+            .addComponent(straightThroughRB)
+            .addComponent(rndRbnRB)
+            .addComponent(stkRB)
+        );
+        poolStratPanelLayout.setVerticalGroup(
+            poolStratPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(poolStratPanelLayout.createSequentialGroup()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(straightThroughRB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rndRbnRB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(stkRB)
+                .addGap(0, 15, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -157,50 +267,21 @@ public class PoolingControls extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(enablePoolingCB)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(inputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(inputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(38, 38, 38)
-                                .addComponent(jLabel3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(outputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(105, Short.MAX_VALUE))
+                    .addComponent(poolingChannelPannel, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(poolStratPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(187, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(enablePoolingCB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(enablePoolingCB)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(inputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(inputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(outputStartSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(outputEndSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(68, Short.MAX_VALUE))
+                        .addComponent(poolingChannelPannel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(poolStratPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -208,18 +289,48 @@ public class PoolingControls extends javax.swing.JPanel {
         updatePooler();
     }//GEN-LAST:event_poolingControlChanged
 
-    private void strategyDropdownChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_strategyDropdownChanged
+    
+    private void enablePoolingCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enablePoolingCBActionPerformed
+        setControlsEnabled(enablePoolingCB.isSelected());
+    }//GEN-LAST:event_enablePoolingCBActionPerformed
+
+    private void setControlsEnabled(boolean enabled){
+        for (Component c : poolingChannelPannel.getComponents()){
+            c.setEnabled(enabled);
+        }
+        for (Component c : poolStratPanel.getComponents()){
+            c.setEnabled(enabled);
+        }
+    }
+    
+    private void poolingStratChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_poolingStratChanged
         updatePooler();
-    }//GEN-LAST:event_strategyDropdownChanged
+    }//GEN-LAST:event_poolingStratChanged
+
+    private DrivePooler.PoolingStrategy getSelectedStrat(){
+        if (stkRB.isSelected()){
+            return DrivePooler.PoolingStrategy.STACK;
+        } else if (rndRbnRB.isSelected()){
+            return DrivePooler.PoolingStrategy.ROUND_ROBIN;
+        } else {
+            return DrivePooler.PoolingStrategy.STRAIGHT_THROUGH;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox enablePoolingCB;
     private javax.swing.JSpinner inputEndSpinner;
     private javax.swing.JSpinner inputStartSpinner;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JSpinner outputEndSpinner;
     private javax.swing.JSpinner outputStartSpinner;
+    private javax.swing.ButtonGroup poolStratBG;
+    private javax.swing.JPanel poolStratPanel;
+    private javax.swing.JPanel poolingChannelPannel;
+    private javax.swing.JRadioButton rndRbnRB;
+    private javax.swing.JRadioButton stkRB;
+    private javax.swing.JRadioButton straightThroughRB;
     // End of variables declaration//GEN-END:variables
 }

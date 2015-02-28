@@ -73,6 +73,7 @@ public class DrivePooler implements Receiver, Transmitter {
                         if (currentNotes[n] == noteNumber) {
                             currentNotes[n] = -1;
                             mappedMessage.setMessage(mappedMessage.getCommand(), n, mappedMessage.getData1(), mappedMessage.getData2());
+                            break; // Only turn off one of the notes
                         }
                     }
                 } else if (mappedMessage.getCommand() == ShortMessage.NOTE_ON) {

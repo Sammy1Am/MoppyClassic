@@ -16,13 +16,17 @@ This version attempts to improve upon the original Moppy by adding additional fu
 - MIDI-IN support
 - Per-channel output control
 - Support for multiple Arduinos/MIDI devices
+- Drive pooling
+
+
+This document is meant to be a sort of quick-start guide.  You can find an FAQ and troubleshooting guide on the [Wiki](https://github.com/SammyIAm/Moppy/wiki).
 
 Installation
 ------------
 The Arduino code requires the TimeOne library available here: http://www.arduino.cc/playground/Code/Timer1
 
 
-You will need to follow the directions in the appropriate Java/SerialDrivers folder for your system to install the serial drivers prior to running Moppy.
+The latest build is using NRJavaSerial, which should include suitable native drives for most systems.  If you've previously run an older version of Moppy, you'll need to make sure that the RXTX jar file(s) are **not** being loaded (i.e. not on the classpath, &c.), since the two libraries will conflict if both present.
 
 
 Upload the included Arduino code to the Arduino of your choice (requires [Arduino IDE](http://arduino.cc/en/Main/Software)), and open up the included Java code in your favorite IDE.  This code includes a NetBeans project for your convenience, so you should be able to open the project directly in NetBeans.
@@ -42,12 +46,12 @@ Also, it's VERY IMPORTANT that your Arduino is grounded with the drives, or the 
 
 Configuration and use
 ---------------------
-- Open up the code in [NetBeans](http://netbeans.org) (or your favorite IDE) and run it.  Alternatively, you can build the MoppyDesk.jar file and run that.
-- Select the COM port that the Arduino is hooked up to from the "Arduino Port" drop-down.  You will need to have this configured before you launch MoppyDesk.
-- Click the "Connect" button to create a new Sequencer connected to the specified COM port.
+- Open up the code in [NetBeans](http://netbeans.org) (or your favorite IDE) and run it.  Alternatively, you can build the MoppyDesk.jar file and run that directly.
+- On the right half of the screen, check the channel output boxes for the number of drives you have connected, select "Moppy", and choose the COM port that you have your Arduino connected to.
 - Click the "Load Sequence" button and select a suitable MIDI file (see below).
+- Click the "Connect" button to connect the program to the devices specified in the output area.
 - Click "Start" to start playback (if all goes well).  
-- The Stop/Reset button will stop playback and reset the drives.  Pressing "Start" again will resume from where the sequencer left off.  You will need to reload the MIDI to start from the beginning.
+- The Stop/Reset button will stop playback and reset the drives.
 
 MIDI file information and guidelines
 ------------------------------------
