@@ -46,6 +46,8 @@
                       <Component id="saveListButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="randomizeButton" min="-2" pref="60" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="loadLastListCheckbox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -99,6 +101,7 @@
                       <Component id="loadListButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="saveListButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="randomizeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="loadLastListCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
@@ -349,6 +352,19 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="randomizeButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="loadLastListCheckbox">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Tahoma" size="10" style="0"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Load last MPL on startup"/>
+        <Property name="toolTipText" type="java.lang.String" value="If selected, will load the last successfully loaded MPL file"/>
+        <Property name="actionCommand" type="java.lang.String" value="Load last MPL on startup"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadLastListCheckboxActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

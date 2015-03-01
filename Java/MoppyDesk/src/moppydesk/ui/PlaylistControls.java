@@ -66,6 +66,22 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
         sequenceChooser.addChoosableFileFilter(MPLFilter);
     }
 
+    
+    @Override
+    public void savePreferences() {
+        //Nothing to do here! All prefs are saved upon UI actions currently
+    }
+    
+    @Override
+    public void loadPreferences() {
+        loadLastListCheckbox.setSelected(app.prefs.getBoolean(Constants.PREF_LOAD_MPL_ON_START, false));
+        String previouslyLoaded = app.prefs.get(Constants.PREF_LOADED_MPL, null);
+        if (previouslyLoaded != null && !previouslyLoaded.isEmpty() && loadLastListCheckbox.isSelected()) { 
+            //Try to load the last MPL, if it fails, clear out the preference
+            if (!loadPlaylist(new File(previouslyLoaded))) { app.prefs.put(Constants.PREF_LOADED_MPL, ""); }                           
+        }
+    }    
+    
     private void updateProgressDisplay() {
         long currentSeconds = seq.getSecondsPosition();
         sequenceProgressSlider.setValue((int) (currentSeconds));
@@ -108,6 +124,7 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
         nextButton = new javax.swing.JButton();
         loadDirectoryButton = new javax.swing.JButton();
         randomizeButton = new javax.swing.JButton();
+        loadLastListCheckbox = new javax.swing.JCheckBox();
 
         setMaximumSize(new java.awt.Dimension(529, 240));
         setMinimumSize(new java.awt.Dimension(0, 0));
@@ -266,6 +283,16 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
             }
         });
 
+        loadLastListCheckbox.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        loadLastListCheckbox.setText("Load last MPL on startup");
+        loadLastListCheckbox.setToolTipText("If selected, will load the last successfully loaded MPL file");
+        loadLastListCheckbox.setActionCommand("Load last MPL on startup");
+        loadLastListCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadLastListCheckboxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -285,6 +312,8 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
                         .addComponent(saveListButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(randomizeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(loadLastListCheckbox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -326,7 +355,8 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(loadListButton)
                         .addComponent(saveListButton)
-                        .addComponent(randomizeButton))
+                        .addComponent(randomizeButton)
+                        .addComponent(loadLastListCheckbox))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -410,11 +440,11 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
     }//GEN-LAST:event_resetListButtonstopResetClicked
 
     private void loadListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadListButtonActionPerformed
-        loadPlaylist();
+        loadPlaylist(getPlaylistFile(true));
     }//GEN-LAST:event_loadListButtonActionPerformed
 
     private void saveListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveListButtonActionPerformed
-        savePlaylist();
+        savePlaylist(getPlaylistFile(false));
     }//GEN-LAST:event_saveListButtonActionPerformed
 
     private void resetDrivesCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetDrivesCheckboxActionPerformed
@@ -488,11 +518,17 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
     private void randomizeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_randomizeButtonActionPerformed
         playlist.randomize();
     }//GEN-LAST:event_randomizeButtonActionPerformed
+
+    private void loadLastListCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadLastListCheckboxActionPerformed
+        app.prefs.putBoolean(Constants.PREF_LOAD_MPL_ON_START, loadLastListCheckbox.isSelected());
+    }//GEN-LAST:event_loadLastListCheckboxActionPerformed
         
+    @Override
     public void tempoChanged(int newTempo) {
         bpmLabel.setText(newTempo + " bpm");
     }
     
+    @Override
     public void sequenceEnded() {                
         try {
             playlist.currentSongFinished();
@@ -538,6 +574,7 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton loadButton;
     private javax.swing.JButton loadDirectoryButton;
+    private javax.swing.JCheckBox loadLastListCheckbox;
     private javax.swing.JButton loadListButton;
     private javax.swing.JButton nextButton;
     private javax.swing.JScrollPane playlistScrollPane;
@@ -554,16 +591,19 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
     private javax.swing.JLabel totalPositionLabel;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public Transmitter getTransmitter() {
         return seq;
     }
 
+    @Override
     public void connected() {
         progressTimer.start();
         isConnected = true;
         if (!(playlist.isFinished())) {startButton.setEnabled(true);}
     }
 
+    @Override
     public void disconnected() {
         startButton.setEnabled(false);
         pauseSequencer();
@@ -630,15 +670,19 @@ public class PlaylistControls extends InputPanel implements MoppyStatusConsumer 
         return null;
     }
     
-    private void savePlaylist() {
-        File f = getPlaylistFile(false);        
+    private boolean savePlaylist(File f) {               
         if(playlist.savePlaylistFile(f)) {}
+        else {return false;}
+        return true;
     }
     
-    private void loadPlaylist() {
-        File f = getPlaylistFile(true);
-        if(playlist.loadPlaylistFile(f)) {}
-        if (isConnected && !playlist.isEmpty()) {startButton.setEnabled(true);}
+    private boolean loadPlaylist(File f) {        
+        if(playlist.loadPlaylistFile(f)) {
+            app.prefs.put(Constants.PREF_LOADED_MPL, f.getPath());
+            if (isConnected && !playlist.isEmpty()) {startButton.setEnabled(true);}
+        }
+        else {return false;}        
+        return true;
     }
 
     private void setupPlaylistTable() {        
