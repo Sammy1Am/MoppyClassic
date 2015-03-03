@@ -33,6 +33,7 @@ public class PoolingControls extends javax.swing.JPanel {
 
         loadSettings();
         updatePooler();
+        setControlsEnabled(enablePoolingCB.isSelected());
     }
 
     public boolean isPoolingEnabled() {
