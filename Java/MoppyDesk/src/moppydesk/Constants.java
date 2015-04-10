@@ -17,6 +17,7 @@ public class Constants {
     public static final String PREF_LOADED_MPL = "lastLoadedPlaylistFile";
     public static final String PREF_LOAD_MPL_ON_START = "loadMPLValue";
     
+    //Pooling preferences
     public static final String PREF_POOL_ENABLE = "poolingEnabled";
     public static final String PREF_POOL_FROM_START = "poolingFromStart";
     public static final String PREF_POOL_FROM_END = "poolingFromEnd";
@@ -24,6 +25,7 @@ public class Constants {
     public static final String PREF_POOL_TO_END = "poolingToEnd";
     public static final String PREF_POOL_STRATEGY = "poolingStrategy";
 
+    //Filter preferences
     public static final String PREF_FILTER_CONSTRAIN = "filterAutoConstrain";
     public static final String PREF_FILTER_IGNORETEN = "ignore10";
 

@@ -219,7 +219,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             inputSelectBox.setEnabled(false);
             
             // Always connect to the note filter
-            seqControls.getTransmitter().setReceiver(filterControls1.getNoteFilter());
+            currentInputPanel.getTransmitter().setReceiver(filterControls1.getNoteFilter());
             
             // Only connect to pooling if it's enabled.
             if (poolingControls1.isPoolingEnabled()){
