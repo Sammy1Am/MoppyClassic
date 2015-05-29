@@ -48,6 +48,7 @@ public class FilterControls extends javax.swing.JPanel {
     private void loadSettings() {
         constrainCB.setSelected(app.prefs.getBoolean(Constants.PREF_FILTER_CONSTRAIN, false));
         ignoreTenCB.setSelected(app.prefs.getBoolean(Constants.PREF_FILTER_IGNORETEN, false));
+        noteMultiplierSpinner.setValue(app.prefs.getInt(Constants.PREF_FILTER_NOTEMULTIPLY, 1));
 
         updateFilter();
     }
@@ -55,6 +56,7 @@ public class FilterControls extends javax.swing.JPanel {
     private void saveSettings() {
         app.prefs.putBoolean(Constants.PREF_FILTER_CONSTRAIN, constrainCB.isSelected());
         app.prefs.putBoolean(Constants.PREF_FILTER_IGNORETEN, ignoreTenCB.isSelected());
+        app.prefs.putInt(Constants.PREF_FILTER_NOTEMULTIPLY, (int)noteMultiplierSpinner.getValue());
 
         app.savePreferences();
     }
@@ -62,6 +64,7 @@ public class FilterControls extends javax.swing.JPanel {
     private void updateFilter() {
         filter.setAutoConstrain(constrainCB.isSelected());
         filter.setIgnoreTen(ignoreTenCB.isSelected());
+        filter.setNoteMultiplier((int)noteMultiplierSpinner.getValue());
     }
 
     /**
@@ -75,6 +78,9 @@ public class FilterControls extends javax.swing.JPanel {
 
         constrainCB = new javax.swing.JCheckBox();
         ignoreTenCB = new javax.swing.JCheckBox();
+        noteMultiplierPanel = new javax.swing.JPanel();
+        noteMultiplierSpinner = new javax.swing.JSpinner();
+        jLabel1 = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
         setPreferredSize(new java.awt.Dimension(149, 149));
@@ -95,6 +101,38 @@ public class FilterControls extends javax.swing.JPanel {
             }
         });
 
+        noteMultiplierSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 16, 1));
+        noteMultiplierSpinner.setToolTipText("Controls how many times note events will be multiplied to create richer sound with drive pooling enabled");
+        noteMultiplierSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                noteMultiplierSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel1.setText("Note multiplier:");
+
+        javax.swing.GroupLayout noteMultiplierPanelLayout = new javax.swing.GroupLayout(noteMultiplierPanel);
+        noteMultiplierPanel.setLayout(noteMultiplierPanelLayout);
+        noteMultiplierPanelLayout.setHorizontalGroup(
+            noteMultiplierPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(noteMultiplierPanelLayout.createSequentialGroup()
+                .addGroup(noteMultiplierPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(noteMultiplierSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        noteMultiplierPanelLayout.setVerticalGroup(
+            noteMultiplierPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(noteMultiplierPanelLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(noteMultiplierSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(54, Short.MAX_VALUE))
+        );
+
+        noteMultiplierSpinner.getAccessibleContext().setAccessibleName("Note multiplier");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -103,8 +141,9 @@ public class FilterControls extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(constrainCB)
-                    .addComponent(ignoreTenCB))
-                .addContainerGap(49, Short.MAX_VALUE))
+                    .addComponent(ignoreTenCB)
+                    .addComponent(noteMultiplierPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -113,7 +152,9 @@ public class FilterControls extends javax.swing.JPanel {
                 .addComponent(constrainCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ignoreTenCB)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(noteMultiplierPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -125,15 +166,23 @@ public class FilterControls extends javax.swing.JPanel {
         updateFilter();
     }//GEN-LAST:event_ignoreTenCBActionPerformed
 
+    private void noteMultiplierSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_noteMultiplierSpinnerStateChanged
+        updateFilter();
+    }//GEN-LAST:event_noteMultiplierSpinnerStateChanged
+
     
     private void setControlsEnabled(boolean enabled){
         constrainCB.setEnabled(enabled);
         ignoreTenCB.setEnabled(enabled);
+        noteMultiplierSpinner.setEnabled(enabled);
     }
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox constrainCB;
     private javax.swing.JCheckBox ignoreTenCB;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel noteMultiplierPanel;
+    private javax.swing.JSpinner noteMultiplierSpinner;
     // End of variables declaration//GEN-END:variables
 }
