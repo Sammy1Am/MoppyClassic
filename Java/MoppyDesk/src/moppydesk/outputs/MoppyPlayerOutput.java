@@ -33,12 +33,18 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     /**
      * Maximum number of cents to bend +/-.
      */
-    private static int BEND_CENTS = 200;
+    private int BEND_CENTS = 200;
     
     /**
      * Resolution of the Arduino code in microSeconds.
      */
     public static int ARDUINO_RESOLUTION = 40;
+    
+    /**
+     * Notes lower than this velocity won't be played.
+     * 127 = 100%. Limited to range 1 - 127.
+     */
+    private static int MINIMUM_VELOCITY = 16;
     
     /**
      * Current period of each MIDI channel (zero is off) as set 
@@ -86,8 +92,8 @@ public class MoppyPlayerOutput implements MoppyReceiver {
             //System.out.println("Got note ON on pin: " + (pin & 0xFF) + " with period " + period);
             //System.out.println(message.getLength() + " " + message.getMessage()[message.getLength()-1]);
 
-            //Zero velocity events turn off the pin.
-            if (message.getMessage()[2] == 0) {
+            //Zero velocity events notes with velocity below the threshold turn off the pin.
+            if (message.getMessage()[2] < Math.min(Math.max(MINIMUM_VELOCITY,1),127)) {
                 mb.sendEvent(pin, 0);
                 currentPeriod[message.getStatus() - 144] = 0;
             } else {
