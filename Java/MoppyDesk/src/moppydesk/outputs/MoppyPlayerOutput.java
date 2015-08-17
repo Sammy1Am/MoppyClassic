@@ -33,7 +33,7 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     /**
      * Maximum number of cents to bend +/-.
      */
-    private int BEND_CENTS = 200;
+    private static int BEND_CENTS = 200;
     
     /**
      * Resolution of the Arduino code in microSeconds.
