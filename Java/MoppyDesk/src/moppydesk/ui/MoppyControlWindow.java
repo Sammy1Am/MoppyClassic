@@ -45,21 +45,12 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         seqControls = new SequencerControls(app, this, app.ms);
         playControls = new PlaylistControls(app, this, app.ms);
         
-        //MrSolidSnake745: Telling all controls to load their preferences
-        //TODO: Create a collection of InputPanels that holds all controls and can be binded to the dropdown; then we can iterate through the collection and tell each one to load prefs
-        midiInControls.loadPreferences();
-        seqControls.loadPreferences();
-        playControls.loadPreferences();
-        
-        //MrSolidSnake745: Should not be necessary now since we add the listener while setting the current control
-        //app.ms.addListener(seqControls);
-        
         availableMIDIOuts = MoppyMIDIOutput.getMIDIOutInfos();
         loadOutputSettings();
 
         initComponents();
 
-        updateInputPanel();
+        updateInputPanel();  //Sammy1Am: Preferences will be loaded for the input panels in this call
         setupOutputControls();
     }
 
@@ -228,7 +219,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             inputSelectBox.setEnabled(false);
             
             // Always connect to the note filter
-            seqControls.getTransmitter().setReceiver(filterControls1.getNoteFilter());
+            currentInputPanel.getTransmitter().setReceiver(filterControls1.getNoteFilter());
             
             // Only connect to pooling if it's enabled.
             if (poolingControls1.isPoolingEnabled()){
@@ -311,6 +302,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
         }
         //Adding listener back for the selected panel if it implements MoppyStatusConsumer
         if (currentInputPanel instanceof MoppyStatusConsumer) app.ms.addListener((MoppyStatusConsumer) currentInputPanel);
+        
+        //Before adding the panel to the mainUI, load its preferences (in case something has been changed (e.g. by another input panel)
+        currentInputPanel.loadPreferences();
         
         mainInputPanel.add(currentInputPanel);
         mainInputPanel.revalidate();
