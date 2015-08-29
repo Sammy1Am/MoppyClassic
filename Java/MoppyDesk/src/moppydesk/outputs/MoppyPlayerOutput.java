@@ -54,8 +54,8 @@ public class MoppyPlayerOutput implements MoppyReceiver {
     }
 
     public void close() {
-            mb.resetDrives();
-            mb.close();
+        mb.resetDrives();
+        mb.close();
     }
 
     //Is called by Java MIDI libraries for each MIDI message encountered.
@@ -112,11 +112,10 @@ public class MoppyPlayerOutput implements MoppyReceiver {
 
     }
 
-    public void reset() {
-        mb.resetDrives();
-    }
-
-    public void silence() {
-        mb.silenceDrives();
-    }
+    public void reset() { mb.resetDrives(); }
+    public void silence() { mb.silenceDrives(); }    
+    public void connecting() { mb.sendEvent((byte) 100, (byte) 1, (byte) 0); }    
+    public void disconnecting() { mb.sendEvent((byte) 100, (byte) 2, (byte) 0); }    
+    public void sequenceStarting() { mb.sendEvent((byte) 100, (byte) 3, (byte) 0); }    
+    public void sequenceStopping() { mb.sendEvent((byte) 100, (byte) 4, (byte) 0); }  
 }

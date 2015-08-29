@@ -33,7 +33,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     SequencerControls seqControls;
     PlaylistControls playControls;
     
-    InputPanel currentInputPanel;
+    public InputPanel currentInputPanel;
 
     /**
      * Creates new form MoppyControlWindow
@@ -213,7 +213,8 @@ public class MoppyControlWindow extends javax.swing.JFrame {
             currentInputPanel.savePreferences();
             
             setStatus("Initializing Receivers...");
-            initializeReceivers();
+            initializeReceivers();                      
+            app.rm.connecting();
             
             //If pooling is enabled, send messages through pooler, otherwise bypass it
             inputSelectBox.setEnabled(false);
@@ -260,8 +261,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
 
     private void initializeReceivers() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, MidiUnavailableException {
-        app.rm.clearReceivers();
-        
+        app.rm.clearReceivers();        
         outputPlayers.clear();
         
         for (int ch = 1; ch <= 16; ch++) {
@@ -282,7 +282,7 @@ public class MoppyControlWindow extends javax.swing.JFrame {
                     app.rm.setReceiver(ch, outputPlayers.get(os.midiDeviceName));
                 }
             }
-        }
+        }                
     }
 
     private void updateInputPanel(){        

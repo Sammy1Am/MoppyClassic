@@ -27,6 +27,7 @@ import moppydesk.ui.MoppyControlWindow;
  */
 public class MoppyUI {
 
+    MoppyControlWindow mainWindow;
     //Input objects
     public MoppySequencer ms;
     public MoppyMIDIInput midiIn;
@@ -40,18 +41,28 @@ public class MoppyUI {
     protected void startup() {
         //Initialize parts
         try {
-            ms = new MoppySequencer();
+            ms = new MoppySequencer(rm);
             midiIn = new MoppyMIDIInput();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.toString());
         }
-        MoppyControlWindow mainWindow = new MoppyControlWindow(this);
+        mainWindow = new MoppyControlWindow(this);
         mainWindow.setStatus("Initializing...");
         mainWindow.setVisible(true);
         mainWindow.setStatus("Initialized.");
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() { shutdownTasks(); }
+        }));
     }
 
+    //Things to do/cleanup before we close the application
+    private void shutdownTasks() {
+        mainWindow.currentInputPanel.shuttingDown();
+        rm.close();
+    }
+    
     /**
      * Main method launching the application.
      */
