@@ -67,32 +67,38 @@ void setup(){
   pinMode(16, OUTPUT); // Step control 8
   pinMode(17, OUTPUT); // Direction 8
 
+  //With all pins setup, let's do a first run reset
+  resetAll();
+  delay(1000);
+	
   Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
   Timer1.attachInterrupt(tick); // Attach the tick function
 
   Serial.begin(9600);
 }
 
-
 void loop(){
-
-  //The first loop, reset all the drives, and wait 2 seconds...
-  if (firstRun)
-  {
-    firstRun = false;
-    resetAll();
-    delay(2000);
-  }
-
-  //Only read if we have 
+  //Only read if we have 3 bytes waiting
   if (Serial.available() > 2){
-    //Watch for special 100-message to reset the drives
+    //Watch for special 100-message to act on
     if (Serial.peek() == 100) {
-      resetAll();
+      //Clear the peeked 100 byte so we can get the following data packet
+      Serial.read();
+      byte byte2 = Serial.read();
+      
+      //This isn't used for anything right now, always set to 0
+      //byte byte3 = Serial.read();
+      
+      switch(byte2) {
+        case 0: resetAll(); break;
+        case 1: break;  //Connected
+        case 2: break;  //Disconnected
+        case 3: break;  //Sequence starting
+        case 4: break;  //Sequence stopping
+        default: resetAll(); break;
+      }      
       //Flush any remaining messages.
-      while(Serial.available() > 0){
-        Serial.read();
-      }
+      while(Serial.available() > 0) { Serial.read(); }
     } 
     else{
       currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
@@ -102,7 +108,7 @@ void loop(){
 
 
 /*
-Called by the timer inturrupt at the specified resolution.
+Called by the timer interrupt at the specified resolution.
  */
 void tick()
 {

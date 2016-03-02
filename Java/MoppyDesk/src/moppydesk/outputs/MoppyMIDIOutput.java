@@ -94,4 +94,10 @@ public class MoppyMIDIOutput implements MoppyReceiver{
             }
         }
     }
+    
+    //Nothing to do here
+    public void connecting() { }    
+    public void disconnecting() { }    
+    public void sequenceStarting() { }    
+    public void sequenceStopping() { }  
 }
