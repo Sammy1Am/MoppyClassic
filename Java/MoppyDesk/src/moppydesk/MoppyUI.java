@@ -5,17 +5,12 @@
 package moppydesk;
 
 import moppydesk.inputs.MoppySequencer;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
 import java.awt.EventQueue;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
 import javax.swing.JOptionPane;
 import moppydesk.inputs.MoppyMIDIInput;
 import moppydesk.outputs.ReceiverMarshaller;
@@ -32,7 +27,7 @@ public class MoppyUI {
     public MoppySequencer ms;
     public MoppyMIDIInput midiIn;
     /**
-     * The {@link ReceiverMarshaller} will be added as a receiver to whatver
+     * The {@link ReceiverMarshaller} will be added as a receiver to whatever
      * input object is selected.
      */
     public ReceiverMarshaller rm = new ReceiverMarshaller();
