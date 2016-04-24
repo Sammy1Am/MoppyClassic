@@ -4,6 +4,7 @@ import java.awt.Component;
 import moppydesk.inputs.MoppySequencer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -430,4 +431,44 @@ public final class SequencerControls extends InputPanel implements MoppyStatusCo
     public void setEnabledAllControls(boolean value) {
         for (Component c : this.getComponents()) {c.setEnabled(value);}
     }
+
+    // <editor-fold defaultstate="collapsed" desc="Key Events">  
+    
+    @Override
+    public boolean enterKeyAction(KeyEvent e) { 
+        //Simulate clicking start button
+        startButtonClicked(null);
+        return true;
+    }
+
+    @Override
+    public boolean tabKeyAction(KeyEvent e) { 
+        //Simulate clicking stop button
+        stopButtonstopResetClicked(null);
+        return true;
+    }
+
+    @Override
+    public boolean upKeyAction(KeyEvent e) { 
+        //Skip ahead 10 seconds                
+        seq.stopSequencer();        
+        long newPosition = seq.getSecondsPosition() + 10;
+        if(newPosition > seq.getSecondsLength()) newPosition = seq.getSecondsLength();
+        seq.setSecondsPosition(newPosition);        
+        seq.startSequencer();
+        return true;
+    }
+
+    @Override
+    public boolean downKeyAction(KeyEvent e) { 
+        //Go back 10 seconds         
+        seq.stopSequencer();
+        long newPosition = seq.getSecondsPosition() - 10;
+        if(newPosition < 0) newPosition = 0;
+        seq.setSecondsPosition(newPosition);        
+        seq.startSequencer();
+        return true;
+    }
+    
+    // </editor-fold>           
 }

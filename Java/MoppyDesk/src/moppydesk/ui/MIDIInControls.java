@@ -9,7 +9,6 @@ import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Transmitter;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.DefaultComboBoxModel;
 
 /**
@@ -95,5 +94,5 @@ public class MIDIInControls extends InputPanel {
 
     public void disconnected() {
         midiInput.setReceiver(null); // Clear out receiver so that MIDI messages aren't sent anywhere.
-    }
+    }         
 }
