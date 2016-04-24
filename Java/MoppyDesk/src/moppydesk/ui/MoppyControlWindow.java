@@ -7,6 +7,9 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import java.awt.Component;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -21,7 +24,10 @@ import moppydesk.outputs.MoppyReceiver;
  *
  * @author Sammy1Am
  */
-public class MoppyControlWindow extends javax.swing.JFrame {
+public class MoppyControlWindow 
+    extends javax.swing.JFrame 
+    implements KeyEventDispatcher
+{
 
     MoppyUI app;
     HashMap<String, Info> availableMIDIOuts;
@@ -52,6 +58,9 @@ public class MoppyControlWindow extends javax.swing.JFrame {
 
         updateInputPanel();  //Sammy1Am: Preferences will be loaded for the input panels in this call
         setupOutputControls();
+        
+        //Hook up key event handling
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
     }
 
     private void loadOutputSettings() {
@@ -67,8 +76,6 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     }
 
     private void setupOutputControls() {
-
-
         for (OutputSetting s : outputSettings) {
             ChannelOutControl newControl = new ChannelOutControl(this, s);
             //TODO Read in preferences here?  Serialize all properties to preferences?
@@ -340,4 +347,19 @@ public class MoppyControlWindow extends javax.swing.JFrame {
     private javax.swing.JLabel mainStatusLabel;
     private moppydesk.ui.PoolingControls poolingControls1;
     // End of variables declaration//GEN-END:variables
+
+    @Override  
+    public boolean dispatchKeyEvent(KeyEvent e) {        
+        //Captures key events while the main window is focused 
+        //  and causes the current panel respond accordingly
+        if(e.getID() == KeyEvent.KEY_PRESSED) {
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_ENTER: return currentInputPanel.enterKeyAction(e);
+                case KeyEvent.VK_TAB: return currentInputPanel.tabKeyAction(e);
+                case KeyEvent.VK_UP: return currentInputPanel.upKeyAction(e);
+                case KeyEvent.VK_DOWN: return currentInputPanel.downKeyAction(e);
+            }
+        }                        
+        return false;
+    }
 }
