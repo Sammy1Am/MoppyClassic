@@ -23,7 +23,7 @@ This document is meant to be a sort of quick-start guide.  You can find an FAQ a
 
 Installation
 ------------
-The Arduino code requires the TimeOne library available here: http://www.arduino.cc/playground/Code/Timer1
+The Arduino code requires the TimerOne library available here: http://www.arduino.cc/playground/Code/Timer1
 
 
 The latest build is using NRJavaSerial, which should include suitable native drives for most systems.  If you've previously run an older version of Moppy, you'll need to make sure that the RXTX jar file(s) are **not** being loaded (i.e. not on the classpath, &c.), since the two libraries will conflict if both present.
