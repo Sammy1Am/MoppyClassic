@@ -45,7 +45,16 @@ unsigned int currentTick[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 
 };
 
+byte newDrumOutput = 0;
+byte currentDrumOutput = 0;
 
+// For drum bit register (pin outs)
+//Pin connected to ST_CP of 74HC595
+int latchPin = 16;
+//Pin connected to SH_CP of 74HC595
+int clockPin = 17;
+////Pin connected to DS of 74HC595
+int dataPin = 18;
 
 //Setup pins (Even-odd pairs for step control and direction
 void setup(){
@@ -64,8 +73,14 @@ void setup(){
   pinMode(13, OUTPUT); // Direction 6
   pinMode(14, OUTPUT); // Step control 7
   pinMode(15, OUTPUT); // Direction 7
-  pinMode(16, OUTPUT); // Step control 8
-  pinMode(17, OUTPUT); // Direction 8
+  //need these pins for bit register
+  //pinMode(16, OUTPUT); // Step control 8
+  //pinMode(17, OUTPUT); // Direction 8
+  
+  //Set up for pinout to 74HC595 shift register
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
 
   //With all pins setup, let's do a first run reset
   resetAll();
@@ -101,7 +116,8 @@ void loop(){
       while(Serial.available() > 0) { Serial.read(); }
     } 
     else{
-      currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
+     // Less 16 here to ask Arduuino to read MIDI tracks 9 - 16
+      currentPeriod[Serial.read() - 16] = (Serial.read() << 8) | Serial.read();
     }
   }
 }
@@ -123,13 +139,28 @@ void tick()
       currentTick[2]=0;
     }
   }
-  if (currentPeriod[4]>0){
-    currentTick[4]++;
-    if (currentTick[4] >= currentPeriod[4]){
-      togglePin(4,5);
-      currentTick[4]=0;
-    }
+	
+  // *** Drum Track with bit register
+  // may need to exclude wronge values (No issues so far)
+  if (currentPeriod[4] >= 1) {
+    newDrumOutput = currentPeriod[4];
+    currentDrumOutput = newDrumOutput ^ currentDrumOutput;
+    //togglePin(4, 5);
+    // replaceing togglePin with Shiftregistor funtion
+    drumShift();
+    currentPeriod[4] = 0;
   }
+
+/*
+  if (currentPeriod[4]>0){
+  currentTick[4]++;
+  if (currentTick[4] >= currentPeriod[4]){
+    togglePin(4,5);
+    currentTick[4]=0;
+  }
+  }
+*/
+	
   if (currentPeriod[6]>0){
     currentTick[6]++;
     if (currentTick[6] >= currentPeriod[6]){
@@ -165,14 +196,17 @@ void tick()
       currentTick[14]=0;
     }
   }
-  if (currentPeriod[16]>0){
-    currentTick[16]++;
-    if (currentTick[16] >= currentPeriod[16]){
-      togglePin(16,17);
-      currentTick[16]=0;
-    }
+	
+// Need this pin for bit register
+/*
+if (currentPeriod[16] > 0) {
+  currentTick[16]++;
+  if (currentTick[16] >= currentPeriod[16]) {
+    togglePin(16, 17);
+    currentTick[16] = 0;
   }
-
+}
+*/
 }
 
 void togglePin(byte pin, byte direction_pin) {
@@ -200,6 +234,15 @@ void togglePin(byte pin, byte direction_pin) {
   currentState[pin] = ~currentState[pin];
 }
 
+// Funtion to send date to shift register
+void drumShift() {
+  //ground latchPin and hold low while transmiting data bits
+  digitalWrite(latchPin, LOW);
+  shiftOut(dataPin, clockPin, LSBFIRST, currentDrumOutput);
+  //latch pin high to turn on outputs
+  digitalWrite(latchPin, HIGH);
+  //delay(100);
+}
 
 //
 //// UTILITY FUNCTIONS
