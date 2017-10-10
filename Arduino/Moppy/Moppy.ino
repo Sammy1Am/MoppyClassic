@@ -7,6 +7,12 @@ const byte FIRST_PIN = 2;
 const byte PIN_MAX = 17;
 #define RESOLUTION 40 //Microsecond resolution for notes
 
+/* Set to 1 if this is a second Arduino that should play the last 8 of 16 midi channels.
+   Default is 0 if you use a single Arduino.
+   See also https://github.com/SammyIAm/Moppy/issues/35 & https://github.com/SammyIAm/Moppy/issues/124
+*/
+#define PLAY_MIDI_CHANNELS_9_to_16 0
+
 
 /*NOTE: Many of the arrays below contain unused indexes.  This is 
  to prevent the Arduino from having to convert a pin input to an alternate
@@ -101,7 +107,11 @@ void loop(){
       while(Serial.available() > 0) { Serial.read(); }
     } 
     else{
-      currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
+      byte channel = Serial.read();
+      #if defined(PLAY_MIDI_CHANNELS_9_to_16) && PLAY_MIDI_CHANNELS_9_to_16 == 1
+        if(channel > 16) channel -= 16;
+      #endif
+      currentPeriod[channel] = (Serial.read() << 8) | Serial.read();
     }
   }
 }
