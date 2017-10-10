@@ -26,11 +26,11 @@ const byte PIN_MAX = 17;
  80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
  half a position (use 158 and 98).
  */
-byte MAX_POSITION[] = {
+int MAX_POSITION[] = {
   0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
 
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
-byte currentPosition[] = {
+int currentPosition[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 /*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
