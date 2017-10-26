@@ -131,7 +131,9 @@ void tick()
     if (currentTick[2] >= currentPeriod[2]){
       togglePin(2,3);
       currentTick[2]=0;
-    }
+    } 
+  } else if (currentState[2] == LOW) {
+    togglePin(2,3);
   }
   if (currentPeriod[4]>0){
     currentTick[4]++;
@@ -139,6 +141,8 @@ void tick()
       togglePin(4,5);
       currentTick[4]=0;
     }
+  } else if (currentState[4] == LOW) {
+    togglePin(4,5);
   }
   if (currentPeriod[6]>0){
     currentTick[6]++;
@@ -146,6 +150,8 @@ void tick()
       togglePin(6,7);
       currentTick[6]=0;
     }
+  } else if (currentState[6] == LOW) {
+    togglePin(6,7);
   }
   if (currentPeriod[8]>0){
     currentTick[8]++;
@@ -153,6 +159,8 @@ void tick()
       togglePin(8,9);
       currentTick[8]=0;
     }
+  } else if (currentState[8] == LOW) {
+    togglePin(8,9);
   }
   if (currentPeriod[10]>0){
     currentTick[10]++;
@@ -160,6 +168,8 @@ void tick()
       togglePin(10,11);
       currentTick[10]=0;
     }
+  } else if (currentState[10] == LOW) {
+    togglePin(10,11);
   }
   if (currentPeriod[12]>0){
     currentTick[12]++;
@@ -167,6 +177,8 @@ void tick()
       togglePin(12,13);
       currentTick[12]=0;
     }
+  } else if (currentState[12] == LOW) {
+    togglePin(12,13);
   }
   if (currentPeriod[14]>0){
     currentTick[14]++;
@@ -174,6 +186,8 @@ void tick()
       togglePin(14,15);
       currentTick[14]=0;
     }
+  } else if (currentState[14] == LOW) {
+    togglePin(14,15);
   }
   if (currentPeriod[16]>0){
     currentTick[16]++;
@@ -181,6 +195,8 @@ void tick()
       togglePin(16,17);
       currentTick[16]=0;
     }
+  } else if (currentState[16] == LOW) {
+    togglePin(16,17);
   }
 
 }
