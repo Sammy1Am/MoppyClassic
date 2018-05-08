@@ -11,6 +11,12 @@ by Sammy1Am
 
 Moppy is a **M**usical Fl **oppy** controller program built for the [Arduino Uno](http://arduino.cc/en/Main/ArduinoBoardUno).
 
+***
+
+![#FFD700](https://placehold.it/15/FFD700/000000?text=+) **Attention!** This project is in the process of being replaced with [Moppy 2.0](https://github.com/SammyIAm/Moppy2) and is unlikely to see any updates in the future.  While there are still a few features that have yet to be implemented in the 2.0 version, it should alreayd be suitable for most uses (and any new features will only be added there).  This repo will be preserved for historical purposes and just incase someone *needs* something that this older version offers.
+
+***
+
 This version attempts to improve upon the original Moppy by adding additional functionality including:
 
 - MIDI-IN support
