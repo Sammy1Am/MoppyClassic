@@ -1,21 +1,31 @@
 <pre>
-    __  ___                        ___       __                                __
-   /  |/  /___  ____  ____  __  __/   | ____/ /   ______ _____  ________  ____/ /
-  / /|_/ / __ \/ __ \/ __ \/ / / / /| |/ __  / | / / __ `/ __ \/ ___/ _ \/ __  / 
- / /  / / /_/ / /_/ / /_/ / /_/ / ___ / /_/ /| |/ / /_/ / / / / /__/  __/ /_/ /  
-/_/  /_/\____/ .___/ .___/\__, /_/  |_\__,_/ |___/\__,_/_/ /_/\___/\___/\__,_/   
-            /_/   /_/    /____/      
+    __  ___                           __                  __  ___                    ____
+   /  |/  /___  ____  ____  __  __   / /_  ____ ______   /  |/  /___ _   _____  ____/ / /
+  / /|_/ / __ \/ __ \/ __ \/ / / /  / __ \/ __ `/ ___/  / /|_/ / __ \ | / / _ \/ __  / / 
+ / /  / / /_/ / /_/ / /_/ / /_/ /  / / / / /_/ (__  )  / /  / / /_/ / |/ /  __/ /_/ /_/  
+/_/  /_/\____/ .___/ .___/\__, /  /_/ /_/\__,_/____/  /_/  /_/\____/|___/\___/\__,_(_)   
+            /_/   /_/    /____/                                                          
 </pre>
 
-by Sammy1Am
+***
 
-Moppy is a **M**usical Fl **oppy** controller program built for the [Arduino Uno](http://arduino.cc/en/Main/ArduinoBoardUno).
+![#FFD700](https://placehold.it/15/FFD700/000000?text=+) **This project has been replaced with [Moppy 2.0](https://github.com/SammyIAm/Moppy2)** and will not see any updates in the future.  Moppy 2.0 implements nearly all the features that this version had, and adds many additional features, so there's no reason not to head on over there to check it out.  This repo will be preserved for historical purposes and just incase someone *needs* something that this older version offers.
 
 ***
 
-![#FFD700](https://placehold.it/15/FFD700/000000?text=+) **Attention!** This project is in the process of being replaced with [Moppy 2.0](https://github.com/SammyIAm/Moppy2) and is unlikely to see any updates in the future.  While there are still a few features that have yet to be implemented in the 2.0 version, it should alreayd be suitable for most uses (and any new features will only be added there).  This repo will be preserved for historical purposes and just incase someone *needs* something that this older version offers.
+FAQ
+------------
+#### Why Moppy 2.0?
+The original Moppy was good at doing its thing, but not very suitable for modifications and features added by the community (at least without making the initial setup experience more complicated for everyone).  Moppy 2.0 has been redesigned with the goal of keeping the out-of-the-box experience and easy as possible while allowing for advanced users to build and contribute new features and support new devices (like scanners, stepper motors, and relays!).
 
-***
+#### Why a new repository?
+Moppy 2.0 was built from the ground up, so any new "branch" would have started its life by having all its contents deleted and no future merge would ever be possible.
+
+#### What if I still need *this* version of Moppy (for some reason)?
+You can still checkout the last-available version of this repository, but there will be no future development or bug fixes.
+
+## Original README
+------------
 
 This version attempts to improve upon the original Moppy by adding additional functionality including:
 
