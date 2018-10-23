@@ -7,6 +7,12 @@ const byte FIRST_PIN = 2;
 const byte PIN_MAX = 17;
 #define RESOLUTION 40 //Microsecond resolution for notes
 
+/* Set to 1 if this is a second Arduino that should play the last 8 of 16 midi channels.
+   Default is 0 if you use a single Arduino.
+   See also https://github.com/SammyIAm/Moppy/issues/35 & https://github.com/SammyIAm/Moppy/issues/124
+*/
+#define PLAY_MIDI_CHANNELS_9_to_16 0
+
 
 /*NOTE: Many of the arrays below contain unused indexes.  This is 
  to prevent the Arduino from having to convert a pin input to an alternate
@@ -20,11 +26,11 @@ const byte PIN_MAX = 17;
  80 tracks, 5.25" have 50.  These should be doubled, because each tick is now
  half a position (use 158 and 98).
  */
-byte MAX_POSITION[] = {
+int MAX_POSITION[] = {
   0,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0,158,0};
 
 //Array to track the current position of each floppy head.  (Only even indexes (i.e. 2,4,6...) are used)
-byte currentPosition[] = {
+int currentPosition[] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 /*Array to keep track of state of each pin.  Even indexes track the control-pins for toggle purposes.  Odd indexes
@@ -101,7 +107,11 @@ void loop(){
       while(Serial.available() > 0) { Serial.read(); }
     } 
     else{
-      currentPeriod[Serial.read()] = (Serial.read() << 8) | Serial.read();
+      byte channel = Serial.read();
+      #if defined(PLAY_MIDI_CHANNELS_9_to_16) && PLAY_MIDI_CHANNELS_9_to_16 == 1
+        if(channel > 16) channel -= 16;
+      #endif
+      currentPeriod[channel] = (Serial.read() << 8) | Serial.read();
     }
   }
 }
@@ -121,7 +131,9 @@ void tick()
     if (currentTick[2] >= currentPeriod[2]){
       togglePin(2,3);
       currentTick[2]=0;
-    }
+    } 
+  } else if (currentState[2] == LOW) {
+    togglePin(2,3);
   }
   if (currentPeriod[4]>0){
     currentTick[4]++;
@@ -129,6 +141,8 @@ void tick()
       togglePin(4,5);
       currentTick[4]=0;
     }
+  } else if (currentState[4] == LOW) {
+    togglePin(4,5);
   }
   if (currentPeriod[6]>0){
     currentTick[6]++;
@@ -136,6 +150,8 @@ void tick()
       togglePin(6,7);
       currentTick[6]=0;
     }
+  } else if (currentState[6] == LOW) {
+    togglePin(6,7);
   }
   if (currentPeriod[8]>0){
     currentTick[8]++;
@@ -143,6 +159,8 @@ void tick()
       togglePin(8,9);
       currentTick[8]=0;
     }
+  } else if (currentState[8] == LOW) {
+    togglePin(8,9);
   }
   if (currentPeriod[10]>0){
     currentTick[10]++;
@@ -150,6 +168,8 @@ void tick()
       togglePin(10,11);
       currentTick[10]=0;
     }
+  } else if (currentState[10] == LOW) {
+    togglePin(10,11);
   }
   if (currentPeriod[12]>0){
     currentTick[12]++;
@@ -157,6 +177,8 @@ void tick()
       togglePin(12,13);
       currentTick[12]=0;
     }
+  } else if (currentState[12] == LOW) {
+    togglePin(12,13);
   }
   if (currentPeriod[14]>0){
     currentTick[14]++;
@@ -164,6 +186,8 @@ void tick()
       togglePin(14,15);
       currentTick[14]=0;
     }
+  } else if (currentState[14] == LOW) {
+    togglePin(14,15);
   }
   if (currentPeriod[16]>0){
     currentTick[16]++;
@@ -171,6 +195,8 @@ void tick()
       togglePin(16,17);
       currentTick[16]=0;
     }
+  } else if (currentState[16] == LOW) {
+    togglePin(16,17);
   }
 
 }
