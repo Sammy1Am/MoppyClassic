@@ -30,6 +30,36 @@ public class MoppyPlayerOutput implements MoppyReceiver {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
     
+    //   New array to handle drum track. Like above, each "note" is listed in the array and a place holder. 
+//   The value stored in each spot is an integer that in Biaray contains seven 0's and one 1.
+//   The location of the 1 in the 8 bit byte represents a different shift register output.
+//   For example, if we have a small relay acting as a ride cymbal(1), and a larger one for the snare(2) and a 
+//   large motor contactor acting as a kick drum(8). The arduino sketch would output this
+//  - 00000001 (ride)
+//  - 00000010 (snare)
+//  - 00001000 (kick)
+//  and if they all happen on the same beat
+//  - 00001011
+       
+    // Because there are so many different drum sounds I've pre defined the most common.
+    // This works well in most situations but not all.
+    // if the track was writen for Bongos, these values would need adjusting.
+    // The number should also reflex they size of the relay. (Big relay = kickdrum)
+    public static int[] microPeriodsDrum = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, //C1 - B1
+        4, 8, 16, 16, 16, 64, 1, 64, 2, 8, 2, 128, //C2 - B2
+        64, 32, 128, 1, 0, 0, 8, 0, 0, 32, 0, 1, //C3 - B3
+        64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //C4 - B4
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    
+    // to keep track of the number of different drums used in the song
+    private int drumNumber = 1;
+
     /**
      * Maximum number of cents to bend +/-.
      */
@@ -81,11 +111,25 @@ public class MoppyPlayerOutput implements MoppyReceiver {
             // The Arduino's timer will only tick once per X microseconds based on the
             // resolution.  And each tick will only turn the pin on or off.  So a full
             // on-off cycle (one step on the floppy) is two periods.
+          
+            // If drum track - use microPeriodsDrum
+            int period = 0;
+            //** System.out.println(pin & 0xFF);
+            if ((pin & 0xFF) == 20) {
+                // This section will assign a relay to each drum sound as they happen.    
+                if (microPeriodsDrum[(message.getMessage()[1])] == 0) {
+                    microPeriodsDrum[(message.getMessage()[1])] = drumNumber;
+                    System.out.println("Drum Midi value " + (message.getMessage()[1] & 0xff) + " drumNumber " + drumNumber);
+                    drumNumber = drumNumber * 2;
+                }
+                period = microPeriodsDrum[(message.getMessage()[1])];
+                System.out.println("Drum Midi value " + (message.getMessage()[1] & 0xff) + " will be played by relay " + period);
+            } else if ((pin & 0xFF) != 20) {
+                // if it is not from the drum track
             int period = microPeriods[(message.getMessage()[1] & 0xff)] / (ARDUINO_RESOLUTION * 2);
-
             //System.out.println("Got note ON on pin: " + (pin & 0xFF) + " with period " + period);
             //System.out.println(message.getLength() + " " + message.getMessage()[message.getLength()-1]);
-
+            }
             //Zero velocity events turn off the pin.
             if (message.getMessage()[2] == 0) {
                 mb.sendEvent(pin, 0);
