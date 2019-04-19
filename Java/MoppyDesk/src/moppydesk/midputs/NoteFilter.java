@@ -13,6 +13,7 @@ public class NoteFilter implements Receiver, Transmitter {
     Receiver receiver = null;
     private boolean autoContstrain = false;
     private boolean ignoreTen = false;
+    private int noteMultiplier = 1;
     
     private static final int LOWEST_NOTE = 24; //C1
     private static final int HIGHEST_NOTE = 71; //B4
@@ -23,6 +24,10 @@ public class NoteFilter implements Receiver, Transmitter {
     
     public void setIgnoreTen(boolean newValue) {
         ignoreTen = newValue;
+    }
+    
+    public void setNoteMultiplier(int newValue) {
+        noteMultiplier = newValue;
     }
 
     public void send(MidiMessage message, long timeStamp) {
@@ -38,7 +43,10 @@ public class NoteFilter implements Receiver, Transmitter {
                     return; // If we're ignoring 10 and that's the channel, just return immediately
                 }
                 
-                receiver.send(filteredMessage, timeStamp);
+                for (int i = 1; i <= noteMultiplier; i++)
+                {
+                    receiver.send(filteredMessage, timeStamp);
+                }
             } else {
                 receiver.send(message, timeStamp); // If it's not a note event, pass it on through.
             }
